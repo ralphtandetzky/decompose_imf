@@ -2,7 +2,7 @@
 #include <complex>
 #include <vector>
 
-#include "sqr.h"
+#include "cpp_utils/sqr.h"
 #include "calculations.h"
 
 
