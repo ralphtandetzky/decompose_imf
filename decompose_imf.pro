@@ -24,5 +24,4 @@ HEADERS  += \
 FORMS    += \
     gui_main_window.ui
 
-INCLUDEPATH += ../cpp_utils
 LIBS += -L/usr/local/lib/ -lopencv_core -lopencv_imgproc -lopencv_highgui

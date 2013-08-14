@@ -20,12 +20,12 @@
       <string>Target Function</string>
      </property>
      <property name="buddy">
-      <cstring>comboBox</cstring>
+      <cstring>targetFunctionComboBox</cstring>
      </property>
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="QComboBox" name="comboBox"/>
+    <widget class="QComboBox" name="targetFunctionComboBox"/>
    </item>
    <item row="1" column="0">
     <widget class="QLabel" name="label_6">
@@ -33,12 +33,12 @@
       <string>Parameter A</string>
      </property>
      <property name="buddy">
-      <cstring>doubleSpinBox</cstring>
+      <cstring>aSpinBox</cstring>
      </property>
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+    <widget class="QDoubleSpinBox" name="aSpinBox"/>
    </item>
    <item row="2" column="0">
     <widget class="QLabel" name="label_7">
@@ -46,12 +46,12 @@
       <string>Parameter B</string>
      </property>
      <property name="buddy">
-      <cstring>doubleSpinBox_2</cstring>
+      <cstring>bSpinBox</cstring>
      </property>
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
+    <widget class="QDoubleSpinBox" name="bSpinBox"/>
    </item>
    <item row="3" column="0">
     <widget class="QLabel" name="label_8">
@@ -59,12 +59,12 @@
       <string>Parameter C</string>
      </property>
      <property name="buddy">
-      <cstring>doubleSpinBox_3</cstring>
+      <cstring>cSpinBox</cstring>
      </property>
     </widget>
    </item>
    <item row="3" column="1">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_3"/>
+    <widget class="QDoubleSpinBox" name="cSpinBox"/>
    </item>
    <item row="4" column="0">
     <widget class="QLabel" name="label_9">
@@ -72,12 +72,12 @@
       <string>Parameter D</string>
      </property>
      <property name="buddy">
-      <cstring>doubleSpinBox_4</cstring>
+      <cstring>dSpinBox</cstring>
      </property>
     </widget>
    </item>
    <item row="4" column="1">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_4"/>
+    <widget class="QDoubleSpinBox" name="dSpinBox"/>
    </item>
    <item row="5" column="0">
     <widget class="QLabel" name="label">
@@ -85,12 +85,22 @@
       <string>Number of Samples</string>
      </property>
      <property name="buddy">
-      <cstring>spinBox</cstring>
+      <cstring>nSamplesSpinBox</cstring>
      </property>
     </widget>
    </item>
    <item row="5" column="1">
-    <widget class="QSpinBox" name="spinBox"/>
+    <widget class="QSpinBox" name="nSamplesSpinBox">
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>10000</number>
+     </property>
+     <property name="value">
+      <number>30</number>
+     </property>
+    </widget>
    </item>
    <item row="6" column="0">
     <widget class="QLabel" name="label_2">
@@ -98,12 +108,22 @@
       <string>Swarm Size</string>
      </property>
      <property name="buddy">
-      <cstring>spinBox_2</cstring>
+      <cstring>swarmSizeSpinBox</cstring>
      </property>
     </widget>
    </item>
    <item row="6" column="1">
-    <widget class="QSpinBox" name="spinBox_2"/>
+    <widget class="QSpinBox" name="swarmSizeSpinBox">
+     <property name="minimum">
+      <number>4</number>
+     </property>
+     <property name="maximum">
+      <number>10000</number>
+     </property>
+     <property name="value">
+      <number>300</number>
+     </property>
+    </widget>
    </item>
    <item row="7" column="0">
     <widget class="QLabel" name="label_3">
@@ -111,12 +131,22 @@
       <string>Cross Over Probability</string>
      </property>
      <property name="buddy">
-      <cstring>doubleSpinBox_5</cstring>
+      <cstring>coSpinBox</cstring>
      </property>
     </widget>
    </item>
    <item row="7" column="1">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_5"/>
+    <widget class="QDoubleSpinBox" name="coSpinBox">
+     <property name="maximum">
+      <double>1.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.010000000000000</double>
+     </property>
+     <property name="value">
+      <double>0.200000000000000</double>
+     </property>
+    </widget>
    </item>
    <item row="8" column="0">
     <widget class="QLabel" name="label_4">
@@ -124,12 +154,25 @@
       <string>Differential Weight</string>
      </property>
      <property name="buddy">
-      <cstring>doubleSpinBox_6</cstring>
+      <cstring>dwSpinBox</cstring>
      </property>
     </widget>
    </item>
    <item row="8" column="1">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_6"/>
+    <widget class="QDoubleSpinBox" name="dwSpinBox">
+     <property name="minimum">
+      <double>0.500000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>1.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.010000000000000</double>
+     </property>
+     <property name="value">
+      <double>0.600000000000000</double>
+     </property>
+    </widget>
    </item>
    <item row="9" column="1">
     <spacer name="verticalSpacer">
@@ -145,7 +188,7 @@
     </spacer>
    </item>
    <item row="10" column="1">
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="optimizePushButton">
      <property name="text">
       <string>Optimize</string>
      </property>
@@ -156,7 +199,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>pushButton</sender>
+   <sender>optimizePushButton</sender>
    <signal>clicked()</signal>
    <receiver>gui::MainWindow</receiver>
    <slot>optimize()</slot>
