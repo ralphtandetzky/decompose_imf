@@ -5,10 +5,6 @@
 
 namespace gui {
 
-namespace Ui {
-class MainWindow;
-}
-
 class MainWindow : public QWidget
 {
     Q_OBJECT
@@ -16,9 +12,13 @@ class MainWindow : public QWidget
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+private slots:
+    void optimize();
     
 private:
-    std::unique_ptr<Ui::MainWindow> ui;
+    struct Impl;
+    std::unique_ptr<Impl> m;
 };
 
 
