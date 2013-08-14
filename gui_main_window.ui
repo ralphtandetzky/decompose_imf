@@ -194,6 +194,13 @@
      </property>
     </widget>
    </item>
+   <item row="10" column="0">
+    <widget class="QPushButton" name="pushButton">
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>
@@ -209,13 +216,30 @@
      <y>414</y>
     </hint>
     <hint type="destinationlabel">
-     <x>145</x>
-     <y>415</y>
+     <x>260</x>
+     <y>393</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>gui::MainWindow</receiver>
+   <slot>cancel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>61</x>
+     <y>419</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>66</x>
+     <y>394</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <slots>
   <slot>optimize()</slot>
+  <slot>cancel()</slot>
  </slots>
 </ui>

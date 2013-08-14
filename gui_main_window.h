@@ -15,6 +15,7 @@ public:
 
 private slots:
     void optimize();
+    void cancel();
     
 private:
     struct Impl;

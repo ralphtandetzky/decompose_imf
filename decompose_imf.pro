@@ -21,9 +21,17 @@ HEADERS  += \
     optimize.h \
     calculations.h \
     cpp_utils/sqr.h \
-    cpp_utils/std_make_unique.h
+    cpp_utils/std_make_unique.h \
+    cpp_utils/virtual_call.h \
+    cpp_utils/spin_lock.h \
+    cpp_utils/scope_guard.h \
+    cpp_utils/parallel_executor.h \
+    cpp_utils/locking.h \
+    cpp_utils/concurrent_queue.h
 
 FORMS    += \
     gui_main_window.ui
 
 LIBS += -L/usr/local/lib/ -lopencv_core -lopencv_imgproc -lopencv_highgui
+
+OTHER_FILES +=
