@@ -21,3 +21,8 @@ double sumOfSquaresOfDifference(
 
 double costFunction( const std::vector<double> & f,
                      const std::vector<double> & pairsOfReals );
+
+std::vector<std::complex<double>>
+    derive( std::vector<std::complex<double>> f );
+
+double boundaryCondition( std::vector<std::complex<double>> sigma_seq );

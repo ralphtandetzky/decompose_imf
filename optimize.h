@@ -6,6 +6,7 @@
 template < typename Container
          , typename CostFunction
          , typename ShallTerminateFunctor
+         , typename SendBestFitFunctor
          , typename RandomNumberGenerator
            >
 Container differentialEvolution(
@@ -14,12 +15,21 @@ Container differentialEvolution(
         const double differentialWeight,
         CostFunction costFunction,
         ShallTerminateFunctor shallTerminate,
+        SendBestFitFunctor sendBestFit,
         RandomNumberGenerator & rng )
 {
     assert( swarm.size() >= 4 );
     const auto N = swarm[0].size();
     for ( auto & x : swarm )
         assert( x.size() == N );
+    typedef decltype(costFunction(swarm[0])) Cost;
+    std::vector<Cost> costs;
+    std::transform( begin(swarm), end(swarm),
+        back_inserter(costs), costFunction );
+    auto lowestCostIndex = std::max_element(
+        begin(swarm), end(swarm) ) - begin(swarm);
+    sendBestFit( swarm[lowestCostIndex],
+                 costs[lowestCostIndex] );
 
     typedef typename Container::size_type size_type;
     std::uniform_int_distribution<> disX(0, swarm.size()-1);
@@ -43,8 +53,18 @@ Container differentialEvolution(
                     y[i] = swarm[a][i] + differentialWeight *
                             ( swarm[b][i] - swarm[c][i] );
             }
-            if ( costFunction(y) < costFunction(swarm[x]) )
+            const auto cost = costFunction(y);
+            if ( cost < costs[x] )
+            {
                 swarm[x] = y;
+                costs[x] = cost;
+                if ( cost < costs[lowestCostIndex] )
+                {
+                    lowestCostIndex = x;
+                    sendBestFit( swarm[lowestCostIndex],
+                                 costs[lowestCostIndex] );
+                }
+            }
         }
     }
 

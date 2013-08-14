@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "sqr.h"
+#include "calculations.h"
 
 
 std::vector<std::complex<double>>
@@ -46,7 +47,7 @@ std::vector<double> calculateImfFromPairsOfReals(
 {
     return calculateImfFromSigmaFunction(
         calculateSigmaFunctionFromSigmaSequence(
-            groupPairsToComplex( input ) ) );
+            groupPairsToComplex(input)));
 }
 
 
@@ -66,6 +67,47 @@ double sumOfSquaresOfDifference(
 double costFunction( const std::vector<double> & f,
                      const std::vector<double> & pairsOfReals )
 {
+    auto sigma_seq = groupPairsToComplex( pairsOfReals );
+
     return sumOfSquaresOfDifference( f,
-        calculateImfFromPairsOfReals(pairsOfReals) );
+        calculateImfFromSigmaFunction(
+            calculateSigmaFunctionFromSigmaSequence(sigma_seq) ) )
+        + boundaryCondition( sigma_seq );
+}
+
+
+std::vector<std::complex<double>>
+    derive( std::vector<std::complex<double>> f )
+{
+    const auto size = f.size();
+    for ( size_t i = 1; i < size; ++i )
+        f[i-1] = f[i-1] - f[i];
+    f.pop_back();
+    return f;
+}
+
+
+double boundaryCondition( std::vector<std::complex<double>> sigma_seq )
+{
+    const auto tau = derive( std::move(sigma_seq) );
+    double result = 0;
+    for ( size_t i = 1; i < tau.size(); ++i )
+    {
+        const auto lhs = abs(tau[i]-tau[i-1]);
+        const auto rhs = std::min(sqr(tau[i].imag()),sqr(tau[i-1].imag()) );
+        if ( lhs > rhs )
+            result += lhs-rhs+1;
+    }
+    for ( const auto & t : tau )
+    {
+        if ( t.imag() < 0 )
+        {
+            result += 1 - t.imag();
+        }
+        else if ( t.imag() > 3.14159265368979 )
+        {
+            result += 1 + t.imag() - 3.14159265368979;
+        }
+    }
+    return result;
 }

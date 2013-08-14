@@ -20,24 +20,33 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     std::vector<double> f;
-    const int nSamples = 10;
+    const int nSamples = 15;
 
     for ( auto i = 0; i < nSamples; ++i )
     {
-        f.push_back( sin(i*2*3.141592/nSamples) );
+        f.push_back( sin(i*2*3.141592/nSamples*2) );
     }
 
-    std::vector<std::vector<double>> swarm(30,std::vector<double>((f.size()+1)*2));
+    std::vector<std::vector<double>> swarm(300,
+        std::vector<double>((f.size()+1)*2));
     std::minstd_rand rng;
     std::normal_distribution<> normal_dist;
     for ( auto & x : swarm )
         for ( auto & t : x )
             t = normal_dist(rng);
 
-    int nIters = 1000;
+    auto display = []( const std::vector<double> & v )
+    {
+        for ( const auto & elem : v )
+            printf( "%5d;", int(std::round(100*elem)));
+        std::cout << std::endl;
+
+    };
+
+    int nIters = 10000;
     swarm = differentialEvolution(
         std::move(swarm),
-        /*CO =*/ 0.5,
+        /*CO =*/ 0.1,
         /*DW =*/ 0.6,
         [&f]( const std::vector<double> & v ) -> double
         {
@@ -47,15 +56,13 @@ MainWindow::MainWindow(QWidget *parent)
         {
             return --nIters <= 0;
         },
+        [&]( const std::vector<double> & v, double cost )
+        {
+            std::cout << nIters << ' ' << cost << ' ';
+            display(v);
+        },
         rng );
 
-    auto display = []( const std::vector<double> & v )
-    {
-        for ( const auto & elem : v )
-            printf( "%5d;", int(std::round(100*elem)));
-        std::cout << std::endl;
-
-    };
     display(f);
     for ( const auto & row : swarm )
         display( calculateImfFromPairsOfReals(row) );
