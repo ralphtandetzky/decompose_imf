@@ -21,7 +21,6 @@ struct MainWindow::Impl
         : cancelled(true)
         , worker( 1 )
     {
-        cancelled = true;
     }
 
     ~Impl()
