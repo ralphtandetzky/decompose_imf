@@ -19,7 +19,9 @@ SOURCES += main.cpp\
 HEADERS  += \
     gui_main_window.h \
     optimize.h \
-    calculations.h
+    calculations.h \
+    cpp_utils/sqr.h \
+    cpp_utils/std_make_unique.h
 
 FORMS    += \
     gui_main_window.ui
