@@ -81,7 +81,7 @@ std::vector<std::complex<double>>
 {
     const auto size = f.size();
     for ( size_t i = 1; i < size; ++i )
-        f[i-1] = f[i-1] - f[i];
+        f[i-1] = f[i] - f[i-1];
     f.pop_back();
     return f;
 }

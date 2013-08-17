@@ -27,7 +27,8 @@ HEADERS  += \
     cpp_utils/scope_guard.h \
     cpp_utils/parallel_executor.h \
     cpp_utils/locking.h \
-    cpp_utils/concurrent_queue.h
+    cpp_utils/concurrent_queue.h \
+    cpp_utils/more_algorithms.h
 
 FORMS    += \
     gui_main_window.ui
