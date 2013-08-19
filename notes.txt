@@ -1,0 +1,24 @@
+IDEAS FOR IMPROVING THE TOTAL RESULT
+====================================
+* Find one or several reasonable initial approximations of a solution
+	- Find extrema between zeros and interpolate between them for an inital approximation
+	- Possibly it makes sense to interpolate the zeros as well
+	- Erase zeros, if they are located to close to each other
+	- Make sure that boundary conditions are fulfilled automatically (erasing zeros might actually help here)
+	
+* Use a different base for the functions to get better locality characteristics
+	- Try a wavelet base. 
+	- For the imaginary part use a base of monotonic functions satisfying the boundary conditions
+	
+* Combine the boundary conditions $|\tau_i-\tau_{i+1}| \le \min\{ (\Im\tau_j)^2,(\Im\tau_{j+1})^2 \}$ and $0 \le \Im\tau_j$ into one: 
+	$$ |\tau_i-\tau_{i+1}| \le \max\{ 0, \min\{ \Im\tau_j,\Im\tau_{j+1} \} \}^2 $$
+	
+* Allow phase-boost under certain circumstances
+	- If there is a big enough decreasing jump of the phase then a phase boost may be applied.
+
+
+
+THINGS TO DO ON THE GUI
+=======================
+* Let the user choose the noise level to be added to the initial approximation
+* Let the user choose the parameters of the target function
