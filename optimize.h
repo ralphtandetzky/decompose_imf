@@ -28,8 +28,8 @@ Container differentialEvolution(
     std::vector<Cost> costs;
     std::transform( begin(swarm), end(swarm),
         back_inserter(costs), costFunction );
-    auto lowestCostIndex = std::max_element(
-        begin(swarm), end(swarm) ) - begin(swarm);
+    auto lowestCostIndex = std::min_element(
+        begin(costs), end(costs) ) - begin(costs);
     sendBestFit( swarm[lowestCostIndex],
                  costs[lowestCostIndex] );
 
@@ -43,7 +43,7 @@ Container differentialEvolution(
         for ( size_type x = 0; x < swarm.size(); ++x )
         {
             if ( shallTerminate(swarm) )
-                return swarm;
+                return swarm; // loop exit
             size_type a = 0, b = 0, c = 0;
             do a = disX(rng); while ( a == x );
             do b = disX(rng); while ( b == x || b == a );
@@ -52,7 +52,7 @@ Container differentialEvolution(
             auto y = swarm[x];
             for ( size_type i = 0; i < y.size(); ++i )
             {
-                auto r = uniform(rng);
+                const auto r = uniform(rng);
                 if ( r < crossOverProbability || i == R )
                     y[i] = swarm[a][i] + differentialWeight *
                             ( swarm[b][i] - swarm[c][i] );
@@ -119,6 +119,7 @@ Container nelderMead(
     std::multimap<Cost,Rn*> xs;
     for ( auto & x : swarm )
         xs.insert( std::make_pair( costFunction(x),&x ) );
+    sendBestFit( *xs.begin()->second, xs.begin()->first );
 
     while ( !shallTerminate( swarm ) )
     {
