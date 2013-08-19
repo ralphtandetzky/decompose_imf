@@ -1,4 +1,4 @@
-IDEAS FOR IMPROVING THE TOTAL RESULT
+Ideas for improving the total result
 ====================================
 * Find one or several reasonable initial approximations of a solution
 	- Find extrema between zeros and interpolate between them for an inital approximation
@@ -17,8 +17,7 @@ IDEAS FOR IMPROVING THE TOTAL RESULT
 	- If there is a big enough decreasing jump of the phase then a phase boost may be applied.
 
 
-
-THINGS TO DO ON THE GUI
+Things to do on the gui
 =======================
 * Let the user choose the noise level to be added to the initial approximation
 * Let the user choose the parameters of the target function
