@@ -183,3 +183,51 @@ Container nelderMead(
 
     return swarm;
 }
+
+
+template < typename Canditate
+         , typename GetNeighborFunction
+         , typename CostFunction
+         , typename TemperatureFunction
+         , typename ShallTerminateFunctor
+         , typename SendBestFitFunctor
+         , typename RandomNumberGenerator
+           >
+Container simulatedAnnealing(
+        Canditate init,
+        GetNeighborFunction getNeighbor,
+        CostFunction costFunction,
+        TemperatureFunction getTemperature,
+        ShallTerminateFunctor shallTerminate,
+        SendBestFitFunctor sendBestFit,
+        RandomNumberGenerator & rng )
+{
+    auto initCost = costFunction(init);
+    auto best = init;
+    auto bestCost = costFunction(best);
+    sendBestFit( best, bestCost );
+    std::uniform_real_distribution<> uniform;
+    while ( !shallTerminate() )
+    {
+        const auto neighbor = getNeighbor(init);
+        const auto neighborCost = costFunction(neighbor);
+        if ( neighborCost > initCost )
+        {
+            if ( exp( (initCost - neighborCost) / getTemperature() ) > uniform(rng) )
+            {
+                init     = neighbor;
+                initCost = neighborCost;
+            }
+            continue;
+        }
+        init     = neighbor;
+        initCost = neighborCost;
+        if ( initCost < bestCost )
+        {
+            best     = init;
+            bestCost = initCost;
+            sendBestFit( best, bestCost );
+        }
+    }
+    return init;
+}
