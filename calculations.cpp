@@ -94,13 +94,14 @@ double boundaryCondition( std::vector<std::complex<double>> sigma_seq )
     for ( size_t i = 1; i < tau.size(); ++i )
     {
         const auto lhs = abs(tau[i]-tau[i-1]);
-        const auto rhs = std::min(sqr(tau[i].imag()),sqr(tau[i-1].imag()) );
+        const auto rhs = sqr( std::max(0.,
+            std::min(tau[i].imag(),tau[i-1].imag()) ) );
         if ( lhs > rhs )
             result += lhs-rhs+1;
     }
     for ( const auto & t : tau )
     {
-        if ( t.imag() < 0 )
+        if ( t.imag() <= 0 )
         {
             result += 1 - t.imag();
         }
