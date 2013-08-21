@@ -1,9 +1,10 @@
+#include "cpp_utils/sqr.h"
+#include "calculations.h"
+
+#include <algorithm>
 #include <cassert>
 #include <complex>
 #include <vector>
-
-#include "cpp_utils/sqr.h"
-#include "calculations.h"
 
 
 std::vector<std::complex<double>>
@@ -24,9 +25,15 @@ std::vector<std::complex<double>>
     calculateSigmaFunctionFromSigmaSequence(
         std::vector<std::complex<double>> sigma )
 {
+    const auto pi = 3.14159265358979;
+    const auto tau = derive( sigma );
     const auto size = sigma.size();
     for ( size_t i = 1; i < size; ++i )
+    {
         sigma[i-1]=(sigma[i-1]+sigma[i])/2.;
+        if ( abs(tau[i-1].imag()) > pi )
+            sigma[i-1].imag( sigma[i-1].imag()+pi );
+    }
     sigma.pop_back();
     return sigma;
 }
@@ -59,7 +66,7 @@ double sumOfSquaresOfDifference(
     const auto size = lhs.size();
     double sum = 0;
     for ( size_t i = 0; i < size; ++i )
-        sum += sqr(lhs[i]-rhs[i]);
+        sum += cu::sqr(lhs[i]-rhs[i]);
     return sum;
 }
 
@@ -89,12 +96,15 @@ std::vector<std::complex<double>>
 
 double boundaryCondition( std::vector<std::complex<double>> sigma_seq )
 {
-    const auto tau = derive( std::move(sigma_seq) );
+    const double pi = 3.14159265358979;
+    auto tau = derive( std::move(sigma_seq) );
+    for_each( begin(sigma_seq), end(sigma_seq), [pi](std::complex<double>&c)
+    { c.imag( std::remainder( c.imag(), 2*pi ) ); } );
     double result = 0;
     for ( size_t i = 1; i < tau.size(); ++i )
     {
         const auto lhs = abs(tau[i]-tau[i-1]);
-        const auto rhs = sqr( std::max(0.,
+        const auto rhs = cu::sqr( std::max(0.,
             std::min(tau[i].imag(),tau[i-1].imag()) ) );
         if ( lhs > rhs )
             result += lhs-rhs+1;
@@ -104,10 +114,6 @@ double boundaryCondition( std::vector<std::complex<double>> sigma_seq )
         if ( t.imag() <= 0 )
         {
             result += 1 - t.imag();
-        }
-        else if ( t.imag() > 3.14159265368979 )
-        {
-            result += 1 + t.imag() - 3.14159265368979;
         }
     }
     return result;

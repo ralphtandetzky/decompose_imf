@@ -194,7 +194,7 @@ template < typename Canditate
          , typename SendBestFitFunctor
          , typename RandomNumberGenerator
            >
-Container simulatedAnnealing(
+Canditate simulatedAnnealing(
         Canditate init,
         GetNeighborFunction getNeighbor,
         CostFunction costFunction,

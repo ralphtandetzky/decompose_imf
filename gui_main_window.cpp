@@ -32,7 +32,7 @@ struct MainWindow::Impl
     Ui::MainWindow ui;
     std::atomic<bool> cancelled;
     // single-threaded for background ops.
-    ParallelExecutor worker;
+    cu::ParallelExecutor worker;
 };
 
 MainWindow::MainWindow(QWidget *parent)
@@ -70,12 +70,14 @@ void MainWindow::optimize()
             std::vector<double>((f.size()+1)*2));
         std::minstd_rand rng;
         std::normal_distribution<> normal_dist;
+        const double pi = 3.14159265358979;
+        std::uniform_real_distribution<double> uniform(-pi,pi);
         for ( auto & x : swarm )
         {
             for ( size_t i = 0; i < x.size(); i+=2 )
             {
-                x[i  ] = 1*normal_dist(rng);
-                x[i+1] = 1*normal_dist(rng) + i*3.141592/nSamples*2;
+                x[i  ] = 0;//1*normal_dist(rng);
+                x[i+1] = 0.1*uniform(rng) + i*pi/nSamples*2;
             }
         }
 
@@ -88,8 +90,10 @@ void MainWindow::optimize()
 
         int nIter = 0;
 
-        const auto cost = [&f]( const std::vector<double> & v ) -> double
+        const auto cost = [&f,pi]( const std::vector<double> & v ) -> double
         {
+            for ( size_t i = 1; i < v.size(); i+=2 )
+                const_cast<double &>(v[i]) = remainder( v[i], 2*pi );
             return costFunction( f, v );
         };
 
@@ -103,28 +107,34 @@ void MainWindow::optimize()
         {
             std::cout << nIter << ' ' << cost << ' ' << std::endl;
             display(v);
-            QPixmap pixmap(300,300);
+            const int scale = 20;
+            const int psize = v.size()*scale/2;
+            QPixmap pixmap(psize,psize);
             {
                 QPainter painter{&pixmap};
-                painter.fillRect(0,0,300,300,Qt::black);
+                painter.fillRect(0,0,psize,psize,Qt::black);
                 QPolygonF reals, imags;
                 for ( size_t i = 0; i < v.size(); i+=2 )
                 {
-                    reals << QPointF( 5*i, -10*v[i  ] );
-                    imags << QPointF( 5*i, -10*v[i+1] );
+                    reals << QPointF( scale*i/2, -scale*v[i  ] );
+                    imags << QPointF( scale*i/2, -scale*std::remainder(v[i+1],2*pi) );
                 }
                 const auto imf = calculateImfFromPairsOfReals( v );
                 QPolygonF fPoly, imfPoly;
                 for ( size_t i = 0; i < f.size(); ++i )
                 {
-                    fPoly   << QPointF( 10*i, -10*f  [i] );
-                    imfPoly << QPointF( 10*i, -10*imf[i] );
+                    fPoly   << QPointF( scale*i, -scale*f  [i] );
+                    imfPoly << QPointF( scale*i, -scale*imf[i] );
                 }
-                reals  .translate(0,150);
-                imags  .translate(0,150);
-                fPoly  .translate(0,150);
-                imfPoly.translate(0,150);
+                reals  .translate(0,psize/2);
+                imags  .translate(0,psize/2);
+                fPoly  .translate(0,psize/2);
+                imfPoly.translate(0,psize/2);
                 painter.setRenderHint( QPainter::Antialiasing );
+                painter.setPen( Qt::darkGray );
+                painter.drawLine( 0, psize/2, psize, psize/2);
+                painter.drawLine( 0, psize/2-pi*scale, psize, psize/2-pi*scale);
+                painter.drawLine( 0, psize/2+pi*scale, psize, psize/2+pi*scale);
                 painter.setPen( Qt::green );
                 painter.drawPolyline( reals );
                 painter.setPen( Qt::magenta );
