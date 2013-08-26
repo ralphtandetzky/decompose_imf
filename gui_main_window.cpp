@@ -6,6 +6,7 @@
 #include "optimize.h"
 #include "cpp_utils/sqr.h"
 #include "cpp_utils/parallel_executor.h"
+#include "cpp_utils/math_constants.h"
 
 #include <complex>
 #include <vector>
@@ -57,27 +58,27 @@ void MainWindow::optimize()
 
     m->worker.addTask( [=]()
     {
+        using cu::pi;
         m->cancelled = false;
 
         std::vector<double> f;
 
         for ( auto i = 0; i < nSamples; ++i )
         {
-            f.push_back( cos(i*2*3.141592/nSamples*2) );
+            f.push_back( cos(i*2*pi/nSamples*2) );
         }
 
         std::vector<std::vector<double>> swarm( swarmSize,
             std::vector<double>((f.size()+1)*2));
         std::minstd_rand rng;
         std::normal_distribution<> normal_dist;
-        const double pi = 3.14159265358979;
         std::uniform_real_distribution<double> uniform(-pi,pi);
         for ( auto & x : swarm )
         {
             for ( size_t i = 0; i < x.size(); i+=2 )
             {
                 x[i  ] = 0;//1*normal_dist(rng);
-                x[i+1] = 0.1*uniform(rng) + i*pi/nSamples*2;
+                x[i+1] = 1*uniform(rng) + i*pi/nSamples*2;
             }
         }
 
@@ -90,7 +91,7 @@ void MainWindow::optimize()
 
         int nIter = 0;
 
-        const auto cost = [&f,pi]( const std::vector<double> & v ) -> double
+        const auto cost = [&f]( const std::vector<double> & v ) -> double
         {
             for ( size_t i = 1; i < v.size(); i+=2 )
                 const_cast<double &>(v[i]) = remainder( v[i], 2*pi );
