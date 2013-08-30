@@ -44,7 +44,7 @@ std::vector<double> calculateImfFromSigmaFunction(
 {
     std::vector<double> result;
     for ( const auto & z : sigma )
-        result.push_back( exp(z.real())*cos(z.imag()));
+        result.push_back( exp(z.real())*sin(z.imag()));
     return result;
 }
 

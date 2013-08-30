@@ -1,3 +1,6 @@
 [submodule "cpp_utils"]
 	path = cpp_utils
 	url = ../cpp_utils/
+[submodule "qt_utils"]
+	path = qt_utils
+	url = git@github.com:ralphtandetzky/qt_utils.git
