@@ -219,6 +219,19 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>targetFunctionComboBox</tabstop>
+  <tabstop>aSpinBox</tabstop>
+  <tabstop>bSpinBox</tabstop>
+  <tabstop>cSpinBox</tabstop>
+  <tabstop>dSpinBox</tabstop>
+  <tabstop>nSamplesSpinBox</tabstop>
+  <tabstop>swarmSizeSpinBox</tabstop>
+  <tabstop>coSpinBox</tabstop>
+  <tabstop>dwSpinBox</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>optimizePushButton</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
