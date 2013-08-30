@@ -118,4 +118,3 @@ double boundaryCondition( std::vector<std::complex<double>> sigma_seq )
     }
     return result;
 }
-
