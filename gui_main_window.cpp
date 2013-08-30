@@ -78,7 +78,7 @@ void MainWindow::optimize()
             for ( size_t i = 0; i < x.size(); i+=2 )
             {
                 x[i  ] = 0;//1*normal_dist(rng);
-                x[i+1] = 1*uniform(rng) + i*pi/nSamples*2;
+                x[i+1] = 0.2*uniform(rng) + i*pi/nSamples*2 + pi/2;
             }
         }
 
