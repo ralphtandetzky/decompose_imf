@@ -3,7 +3,7 @@
 
 #include "calculations.h"
 #include "cpp_utils/std_make_unique.h"
-#include "optimize.h"
+#include "cpp_utils/optimize.h"
 #include "cpp_utils/sqr.h"
 #include "cpp_utils/parallel_executor.h"
 #include "cpp_utils/math_constants.h"
@@ -149,7 +149,7 @@ void MainWindow::optimize()
                                        Q_ARG(QPixmap,pixmap));
         };
 
-        swarm = differentialEvolution(
+        swarm = cu::differentialEvolution(
             std::move(swarm), crossOverProb, diffWeight,
             cost, shallTerminate, sendBestFit, rng );
 
