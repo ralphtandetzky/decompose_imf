@@ -12,11 +12,8 @@ QMAKE_CXXFLAGS += -std=c++0x
 TARGET = decompose_imf
 TEMPLATE = app
 
-SOURCES += main.cpp\
-    gui_main_window.cpp \
-    calculations.cpp
-
-HEADERS  += \
+PRECOMPILED_HEADER = stdafx.h
+HEADERS  += stdafx.h \
     calculations.h \
     gui_main_window.h \
     cpp_utils/concurrent_queue.h \
@@ -31,7 +28,13 @@ HEADERS  += \
     cpp_utils/std_make_unique.h \
     cpp_utils/value_ptr.h \
     cpp_utils/virtual_call.h \
-    cpp_utils/visitor.h
+    cpp_utils/visitor.h \
+    qt_utils/serialize_props.h
+
+SOURCES += main.cpp\
+    gui_main_window.cpp \
+    calculations.cpp \
+    qt_utils/serialize_props.cpp
 
 FORMS    += \
     gui_main_window.ui

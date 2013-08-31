@@ -8,11 +8,14 @@
 #include "cpp_utils/parallel_executor.h"
 #include "cpp_utils/math_constants.h"
 
+#include "qt_utils/serialize_props.h"
+
 #include <complex>
 #include <vector>
 #include <array>
 #include <iostream>
 #include <thread>
+#include <fstream>
 
 #include <QtGui>
 
@@ -31,22 +34,36 @@ struct MainWindow::Impl
     }
 
     Ui::MainWindow ui;
+    std::vector<std::unique_ptr<qu::PropertySerializer>> serializers;
     std::atomic<bool> cancelled;
     // single-threaded for background ops.
     cu::ParallelExecutor worker;
 };
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
     , m( std::make_unique<Impl>() )
 {
     m->ui.setupUi(this);
+    qu::appendPropertySerializers( this->findChildren<QDoubleSpinBox*>(),
+                                   std::back_inserter( m->serializers ) );
+    qu::appendPropertySerializers( this->findChildren<QComboBox*>(),
+                                   std::back_inserter( m->serializers ) );
+    qu::appendPropertySerializers( this->findChildren<QSpinBox*>(),
+                                   std::back_inserter( m->serializers ) );
+    std::ifstream file( "settings.txt" );
+    readProperties( file, m->serializers );
 }
+
 
 MainWindow::~MainWindow()
 {
     cancel();
+    std::ofstream file( "settings.txt" );
+    writeProperties( file, m->serializers );
 }
+
 
 void MainWindow::optimize()
 {
