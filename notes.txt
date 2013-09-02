@@ -15,7 +15,14 @@ Ideas for improving the total result
 	
 * Allow phase-boost under certain circumstances
 	- If there is a big enough decreasing jump of the phase then a phase boost may be applied.
-
+	
+* Avoid negative phase velocity
+	- Under some circumstances the fitted solutions have negative phase velocity over a few samples. 
+	Often these samples could be replaced with other values giving an almost identical function 
+	$a_i(t)\cos\varphi_i(t)$. The idea behind that is very simple: The cosine is an even function. Hence pieces 
+	with negative phase velocity could be replaced by the negative of the original phase plus an integer multiple 
+	of $2*\pi$. 
+	
 
 Things to do on the gui
 =======================
