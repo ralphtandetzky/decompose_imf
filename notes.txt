@@ -28,3 +28,4 @@ Things to do on the gui
 =======================
 * Let the user choose the noise level to be added to the initial approximation
 * Let the user choose the parameters of the target function
+* Let the user choose whether only the phase shall be fitted or both phase and amplitude shall be fitted
