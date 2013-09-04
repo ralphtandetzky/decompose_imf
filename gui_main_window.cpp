@@ -74,6 +74,8 @@ void MainWindow::optimize()
     const int    swarmSize     = m->ui.swarmSizeSpinBox->value();
     const double crossOverProb = m->ui.coSpinBox       ->value();
     const double diffWeight    = m->ui.dwSpinBox       ->value();
+    const double angleDev      = m->ui.aSpinBox        ->value()/360;
+    const double amplitudeDev  = m->ui.bSpinBox        ->value();
 
     m->worker.addTask( [=]()
     {
@@ -96,8 +98,8 @@ void MainWindow::optimize()
         {
             for ( size_t i = 0; i < x.size(); i+=2 )
             {
-                x[i  ] = 0;//1*normal_dist(rng);
-                x[i+1] = 0.2*uniform(rng) + i*pi/nSamples*2 + pi/2;
+                x[i  ] = amplitudeDev*normal_dist(rng);
+                x[i+1] = angleDev*uniform(rng) + i*pi/nSamples*2 + pi/2;
             }
         }
 
