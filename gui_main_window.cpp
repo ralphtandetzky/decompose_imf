@@ -46,11 +46,13 @@ MainWindow::MainWindow(QWidget *parent)
     , m( std::make_unique<Impl>() )
 {
     m->ui.setupUi(this);
-    qu::appendPropertySerializers( this->findChildren<QDoubleSpinBox*>(),
+//    qu::createPropertySerializers( this->findChildren<QCheckBox*>(),
+//                                   std::back_inserter( m->serializers ) );
+    qu::createPropertySerializers( this->findChildren<QDoubleSpinBox*>(),
                                    std::back_inserter( m->serializers ) );
-    qu::appendPropertySerializers( this->findChildren<QComboBox*>(),
+    qu::createPropertySerializers( this->findChildren<QComboBox*>(),
                                    std::back_inserter( m->serializers ) );
-    qu::appendPropertySerializers( this->findChildren<QSpinBox*>(),
+    qu::createPropertySerializers( this->findChildren<QSpinBox*>(),
                                    std::back_inserter( m->serializers ) );
     std::ifstream file( "settings.txt" );
     readProperties( file, m->serializers );
