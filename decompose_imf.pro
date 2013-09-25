@@ -32,16 +32,19 @@ HEADERS  += stdafx.h \
     qt_utils/serialize_props.h \
     cpp_utils/user_parameter.h \
     cpp_utils/cow_ptr.h \
-    cpp_utils/bwt.h
+    cpp_utils/bwt.h \
+    qt_utils/gui_user_parameter.h
 
 SOURCES += main.cpp\
     gui_main_window.cpp \
     calculations.cpp \
-    qt_utils/serialize_props.cpp
+    qt_utils/serialize_props.cpp \
+    qt_utils/gui_user_parameter.cpp
 
 FORMS    += \
     gui_main_window.ui
 
 LIBS += -L/usr/local/lib/ -lopencv_core -lopencv_imgproc -lopencv_highgui
 
-OTHER_FILES +=
+OTHER_FILES += \
+    notes.txt
