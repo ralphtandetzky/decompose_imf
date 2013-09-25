@@ -7,7 +7,7 @@
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-QMAKE_CXXFLAGS += -std=c++0x
+QMAKE_CXXFLAGS += -std=c++0x -pedantic
 
 TARGET = decompose_imf
 TEMPLATE = app
@@ -29,7 +29,10 @@ HEADERS  += stdafx.h \
     cpp_utils/value_ptr.h \
     cpp_utils/virtual_call.h \
     cpp_utils/visitor.h \
-    qt_utils/serialize_props.h
+    qt_utils/serialize_props.h \
+    cpp_utils/user_parameter.h \
+    cpp_utils/cow_ptr.h \
+    cpp_utils/bwt.h
 
 SOURCES += main.cpp\
     gui_main_window.cpp \
