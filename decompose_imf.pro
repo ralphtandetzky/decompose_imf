@@ -33,13 +33,17 @@ HEADERS  += stdafx.h \
     cpp_utils/user_parameter.h \
     cpp_utils/cow_ptr.h \
     cpp_utils/bwt.h \
-    qt_utils/gui_user_parameter.h
+    qt_utils/gui_user_parameter.h \
+    cpp_utils/user_parameter_container.h \
+    cpp_utils/cloning.h
 
 SOURCES += main.cpp\
     gui_main_window.cpp \
     calculations.cpp \
     qt_utils/serialize_props.cpp \
-    qt_utils/gui_user_parameter.cpp
+    qt_utils/gui_user_parameter.cpp \
+    cpp_utils/user_parameter_container.cpp \
+    cpp_utils/user_parameter.cpp
 
 FORMS    += \
     gui_main_window.ui
