@@ -19,6 +19,9 @@
 
 #include <QtGui>
 
+
+#include "cpp_utils/user_parameter.h"
+
 namespace gui {
 
 struct MainWindow::Impl
@@ -45,6 +48,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
     , m( std::make_unique<Impl>() )
 {
+    cu::RealUserParameter rp(0.1,std::string(),std::string(),std::string(),0.0,1.0,0.1,2,std::string(),1);
+
     m->ui.setupUi(this);
 //    qu::createPropertySerializers( this->findChildren<QCheckBox*>(),
 //                                   std::back_inserter( m->serializers ) );
