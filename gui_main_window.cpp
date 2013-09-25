@@ -48,7 +48,11 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
     , m( std::make_unique<Impl>() )
 {
-    cu::RealUserParameter rp(0.1,std::string(),std::string(),std::string(),0.0,1.0,0.1,2,std::string(),1);
+    cu::RealUserParameter rp(0.1,
+        std::string(),std::string(),std::string(),
+        0.0,1.0,0.1,2,std::string(),1);
+    cu::BoolUserParameter bp(true, "blub", "blubber", "A blubber.");
+    cu::IntUserParameter ip(42,"bla","blabber","A blabber.",0,100,1);
 
     m->ui.setupUi(this);
 //    qu::createPropertySerializers( this->findChildren<QCheckBox*>(),
