@@ -2,25 +2,26 @@
 #include "ui_gui_main_window.h"
 
 #include "calculations.h"
-#include "cpp_utils/std_make_unique.h"
-#include "cpp_utils/optimize.h"
-#include "cpp_utils/sqr.h"
-#include "cpp_utils/parallel_executor.h"
+
+#include "cpp_utils/formula_parser.h"
 #include "cpp_utils/math_constants.h"
+#include "cpp_utils/optimize.h"
+#include "cpp_utils/parallel_executor.h"
+#include "cpp_utils/sqr.h"
+#include "cpp_utils/std_make_unique.h"
+#include "cpp_utils/user_parameter.h"
 
 #include "qt_utils/serialize_props.h"
 
-#include <complex>
-#include <vector>
 #include <array>
+#include <complex>
+#include <fstream>
 #include <iostream>
 #include <thread>
-#include <fstream>
+#include <vector>
 
 #include <QtGui>
-
-
-#include "cpp_utils/user_parameter.h"
+#include <QMessageBox>
 
 namespace gui {
 
@@ -59,8 +60,8 @@ MainWindow::MainWindow(QWidget *parent)
 //                                   std::back_inserter( m->serializers ) );
     qu::createPropertySerializers( this->findChildren<QDoubleSpinBox*>(),
                                    std::back_inserter( m->serializers ) );
-    qu::createPropertySerializers( this->findChildren<QComboBox*>(),
-                                   std::back_inserter( m->serializers ) );
+//    qu::createPropertySerializers( this->findChildren<QComboBox*>(),
+//                                   std::back_inserter( m->serializers ) );
     qu::createPropertySerializers( this->findChildren<QSpinBox*>(),
                                    std::back_inserter( m->serializers ) );
     std::ifstream file( "settings.txt" );
@@ -78,14 +79,41 @@ MainWindow::~MainWindow()
 
 void MainWindow::optimize()
 {
+    // cancel the currently running operation (if any)
     cancel();
-    const int    nSamples      = m->ui.nSamplesSpinBox ->value();
-    const int    swarmSize     = m->ui.swarmSizeSpinBox->value();
-    const double crossOverProb = m->ui.coSpinBox       ->value();
-    const double diffWeight    = m->ui.dwSpinBox       ->value();
-    const double angleDev      = m->ui.aSpinBox        ->value()/360;
-    const double amplitudeDev  = m->ui.bSpinBox        ->value();
 
+    // read values from gui
+    const auto functionString = m->ui.functionLineEdit->text().toStdString();
+    const auto xmin           = m->ui.xminSpinBox     ->value();
+    const auto xmax           = m->ui.xmaxSpinBox     ->value();
+    const auto nSamples       = m->ui.nSamplesSpinBox ->value();
+    const auto swarmSize      = m->ui.swarmSizeSpinBox->value();
+    const double angleDev      = m->ui.angleDevSpinBox->value()/180*cu::pi;
+    const double amplitudeDev  = m->ui.amplDevSpinBox ->value();
+    const auto crossOverProb  = m->ui.coSpinBox       ->value();
+    const auto diffWeight     = m->ui.dwSpinBox       ->value();
+
+    // build expression tree for target function
+    const auto expression = std::make_shared<cu::ExpressionTree>();
+    const auto nParsedChars = expression->parse( functionString );
+    if ( nParsedChars < functionString.size() )
+    {
+        std::stringstream ss;
+        ss << "Target function is not valid. "
+              "There seems to be an error here: \n";
+        ss << std::string( begin(functionString),
+                           begin(functionString)+nParsedChars );
+        ss << std::endl << ">>\t";
+        ss << std::string( begin(functionString)+nParsedChars,
+                           end(functionString) );
+        QMessageBox msgBox;
+
+        msgBox.setText( QString::fromStdString(ss.str()) );
+        msgBox.exec();
+        return;
+    }
+
+    // concurrently launch optimization on the worker thread
     m->worker.addTask( [=]()
     {
         using cu::pi;
@@ -94,21 +122,20 @@ void MainWindow::optimize()
         std::vector<double> f;
 
         for ( auto i = 0; i < nSamples; ++i )
-        {
-            f.push_back( cos(i*2*pi/nSamples*2) );
-        }
+            f.push_back( xmin + (xmax-xmin)*i/(nSamples-1) );
+        f = expression->evaluate( f );
 
         std::vector<std::vector<double>> swarm( swarmSize,
             std::vector<double>((f.size()+1)*2));
         std::minstd_rand rng;
         std::normal_distribution<> normal_dist;
-        std::uniform_real_distribution<double> uniform(-pi,pi);
+        std::uniform_real_distribution<double> uniform(-1,1);
         for ( auto & x : swarm )
         {
             for ( size_t i = 0; i < x.size(); i+=2 )
             {
                 x[i  ] = amplitudeDev*normal_dist(rng);
-                x[i+1] = angleDev*uniform(rng) + i*pi/nSamples*2 + pi/2;
+                x[i+1] = angleDev*uniform(rng);// + i*pi/nSamples*2 + pi/2;
             }
         }
 

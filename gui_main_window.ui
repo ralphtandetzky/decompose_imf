@@ -13,18 +13,101 @@
   <property name="windowTitle">
    <string>Decompose IMF</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" columnstretch="1,1">
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_7">
-     <property name="text">
-      <string>Amplitude Deviation</string>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="9" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-     <property name="buddy">
-      <cstring>bSpinBox</cstring>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="1">
+    <widget class="QDoubleSpinBox" name="xminSpinBox">
+     <property name="decimals">
+      <number>3</number>
+     </property>
+     <property name="minimum">
+      <double>-1000.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>1000.000000000000000</double>
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Target Function</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="functionLineEdit"/>
+   </item>
+   <item row="10" column="0" colspan="2">
+    <widget class="QLabel" name="graphDisplay"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>x_min</string>
+     </property>
+     <property name="buddy">
+      <cstring>xminSpinBox</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>Angle Deviation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>x_max</string>
+     </property>
+     <property name="buddy">
+      <cstring>xmaxSpinBox</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Swarm Size</string>
+     </property>
+     <property name="buddy">
+      <cstring>swarmSizeSpinBox</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="1">
+    <widget class="QPushButton" name="optimizePushButton">
+     <property name="text">
+      <string>Optimize</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Differential Weight</string>
+     </property>
+     <property name="buddy">
+      <cstring>dwSpinBox</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
     <widget class="QSpinBox" name="swarmSizeSpinBox">
      <property name="minimum">
       <number>4</number>
@@ -37,91 +120,36 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
-    <widget class="QDoubleSpinBox" name="cSpinBox"/>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_8">
+   <item row="12" column="0">
+    <widget class="QPushButton" name="pushButton">
      <property name="text">
-      <string>Parameter C</string>
-     </property>
-     <property name="buddy">
-      <cstring>cSpinBox</cstring>
+      <string>Cancel</string>
      </property>
     </widget>
+   </item>
+   <item row="11" column="1">
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item row="2" column="1">
-    <widget class="QDoubleSpinBox" name="bSpinBox"/>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_9">
-     <property name="text">
-      <string>Parameter D</string>
+    <widget class="QDoubleSpinBox" name="xmaxSpinBox">
+     <property name="decimals">
+      <number>3</number>
      </property>
-     <property name="buddy">
-      <cstring>dSpinBox</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QDoubleSpinBox" name="dSpinBox"/>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Number of Samples</string>
-     </property>
-     <property name="buddy">
-      <cstring>nSamplesSpinBox</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Target Function</string>
-     </property>
-     <property name="buddy">
-      <cstring>targetFunctionComboBox</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QComboBox" name="targetFunctionComboBox"/>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Angle Deviation</string>
-     </property>
-     <property name="buddy">
-      <cstring>aSpinBox</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QDoubleSpinBox" name="aSpinBox"/>
-   </item>
-   <item row="5" column="1">
-    <widget class="QSpinBox" name="nSamplesSpinBox">
      <property name="minimum">
-      <number>1</number>
+      <double>-1000.000000000000000</double>
      </property>
      <property name="maximum">
-      <number>10000</number>
-     </property>
-     <property name="value">
-      <number>30</number>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Swarm Size</string>
-     </property>
-     <property name="buddy">
-      <cstring>swarmSizeSpinBox</cstring>
+      <double>1000.000000000000000</double>
      </property>
     </widget>
    </item>
@@ -132,16 +160,6 @@
      </property>
      <property name="buddy">
       <cstring>coSpinBox</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Differential Weight</string>
-     </property>
-     <property name="buddy">
-      <cstring>dwSpinBox</cstring>
      </property>
     </widget>
    </item>
@@ -158,17 +176,26 @@
      </property>
     </widget>
    </item>
-   <item row="12" column="1">
-    <widget class="QPushButton" name="optimizePushButton">
-     <property name="text">
-      <string>Optimize</string>
+   <item row="3" column="1">
+    <widget class="QSpinBox" name="nSamplesSpinBox">
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>10000</number>
+     </property>
+     <property name="value">
+      <number>30</number>
      </property>
     </widget>
    </item>
-   <item row="12" column="0">
-    <widget class="QPushButton" name="pushButton">
+   <item row="3" column="0">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Cancel</string>
+      <string>Number of Samples</string>
+     </property>
+     <property name="buddy">
+      <cstring>nSamplesSpinBox</cstring>
      </property>
     </widget>
    </item>
@@ -188,43 +215,47 @@
      </property>
     </widget>
    </item>
-   <item row="9" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
+      <string>Amplitude Deviation</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
+    </widget>
    </item>
-   <item row="11" column="1">
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+   <item row="5" column="1">
+    <widget class="QDoubleSpinBox" name="angleDevSpinBox">
+     <property name="suffix">
+      <string>°</string>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
+     <property name="decimals">
+      <number>1</number>
      </property>
-    </spacer>
+     <property name="maximum">
+      <double>180.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>1.000000000000000</double>
+     </property>
+    </widget>
    </item>
-   <item row="10" column="0" colspan="2">
-    <widget class="QLabel" name="graphDisplay"/>
+   <item row="6" column="1">
+    <widget class="QDoubleSpinBox" name="amplDevSpinBox">
+     <property name="decimals">
+      <number>3</number>
+     </property>
+     <property name="maximum">
+      <double>100.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.100000000000000</double>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>targetFunctionComboBox</tabstop>
-  <tabstop>aSpinBox</tabstop>
-  <tabstop>bSpinBox</tabstop>
-  <tabstop>cSpinBox</tabstop>
-  <tabstop>dSpinBox</tabstop>
+  <tabstop>xminSpinBox</tabstop>
+  <tabstop>xmaxSpinBox</tabstop>
   <tabstop>nSamplesSpinBox</tabstop>
   <tabstop>swarmSizeSpinBox</tabstop>
   <tabstop>coSpinBox</tabstop>

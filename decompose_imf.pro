@@ -36,7 +36,8 @@ HEADERS  += stdafx.h \
     qt_utils/gui_user_parameter.h \
     cpp_utils/user_parameter_container.h \
     cpp_utils/cloning.h \
-    qt_utils/gui_property_sheet.h
+    qt_utils/gui_property_sheet.h \
+    cpp_utils/formula_parser.h
 
 SOURCES += main.cpp\
     gui_main_window.cpp \
@@ -45,7 +46,8 @@ SOURCES += main.cpp\
     qt_utils/gui_user_parameter.cpp \
     cpp_utils/user_parameter_container.cpp \
     cpp_utils/user_parameter.cpp \
-    qt_utils/gui_property_sheet.cpp
+    qt_utils/gui_property_sheet.cpp \
+    cpp_utils/formula_parser.cpp
 
 FORMS    += \
     gui_main_window.ui
