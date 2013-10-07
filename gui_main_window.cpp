@@ -53,9 +53,11 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
     , m( std::make_unique<Impl>() )
 {
-    m->initializers["zero"] =
-        [](const std::vector<double> & f)->std::vector<std::complex<double>>
+    m->initializers["Zero"] =
+        []( const std::vector<double> & f )
         { return std::vector<std::complex<double>>(f.size()+1); };
+    m->initializers["Interpolate zeros"] =
+        &getInitialApproximationByInterpolatingZeros;
     m->ui.setupUi(this);
 
     for ( const auto & initializer : m->initializers )
@@ -221,12 +223,12 @@ void MainWindow::optimize()
 
 //        swarm = nelderMead( swarm, cost, shallTerminate, sendBestFit );
 
-        display(f);
-        for ( const auto & row : swarm )
-            display( calculateImfFromPairsOfReals(row) );
-        std::cout << std::endl;
-        for ( const auto & row : swarm )
-            display( row );
+//        display(f);
+//        for ( const auto & row : swarm )
+//            display( calculateImfFromPairsOfReals(row) );
+//        std::cout << std::endl;
+//        for ( const auto & row : swarm )
+//            display( row );
     } );
 }
 

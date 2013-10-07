@@ -26,3 +26,7 @@ std::vector<std::complex<double>>
     derive( std::vector<std::complex<double>> f );
 
 double boundaryCondition( std::vector<std::complex<double>> sigma_seq );
+
+std::vector<std::complex<double>>
+    getInitialApproximationByInterpolatingZeros(
+        const std::vector<double> & f );
