@@ -16,6 +16,7 @@
 #include <array>
 #include <complex>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <thread>
 #include <vector>
@@ -39,6 +40,9 @@ struct MainWindow::Impl
 
     Ui::MainWindow ui;
     std::vector<std::unique_ptr<qu::PropertySerializer>> serializers;
+    std::map<std::string,std::function<
+        std::vector<std::complex<double>>(
+            const std::vector<double> &)>> initializers;
     std::atomic<bool> cancelled;
     // single-threaded for background ops.
     cu::ParallelExecutor worker;
@@ -49,13 +53,15 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
     , m( std::make_unique<Impl>() )
 {
-    cu::RealUserParameter rp(0.1,
-        std::string(),std::string(),std::string(),
-        0.0,1.0,0.1,2,std::string(),1);
-    cu::BoolUserParameter bp(true, "blub", "blubber", "A blubber.");
-    cu::IntUserParameter ip(42,"bla","blabber","A blabber.",0,100,1);
-
+    m->initializers["zero"] =
+        [](const std::vector<double> & f)->std::vector<std::complex<double>>
+        { return std::vector<std::complex<double>>(f.size()+1); };
     m->ui.setupUi(this);
+
+    for ( const auto & initializer : m->initializers )
+        m->ui.initApproxMethComboBox->addItem(
+            QString::fromStdString(initializer.first) );
+
 //    qu::createPropertySerializers( this->findChildren<QCheckBox*>(),
 //                                   std::back_inserter( m->serializers ) );
     qu::createPropertySerializers( this->findChildren<QDoubleSpinBox*>(),
@@ -88,10 +94,12 @@ void MainWindow::optimize()
     const auto xmax           = m->ui.xmaxSpinBox     ->value();
     const auto nSamples       = m->ui.nSamplesSpinBox ->value();
     const auto swarmSize      = m->ui.swarmSizeSpinBox->value();
-    const double angleDev      = m->ui.angleDevSpinBox->value()/180*cu::pi;
-    const double amplitudeDev  = m->ui.amplDevSpinBox ->value();
+    const auto angleDev       = m->ui.angleDevSpinBox ->value()/180*cu::pi;
+    const auto amplitudeDev   = m->ui.amplDevSpinBox  ->value();
     const auto crossOverProb  = m->ui.coSpinBox       ->value();
     const auto diffWeight     = m->ui.dwSpinBox       ->value();
+    const auto initializer    = m->initializers.at(
+                m->ui.initApproxMethComboBox->currentText().toStdString());
 
     // build expression tree for target function
     const auto expression = std::make_shared<cu::ExpressionTree>();
@@ -125,17 +133,18 @@ void MainWindow::optimize()
             f.push_back( xmin + (xmax-xmin)*i/(nSamples-1) );
         f = expression->evaluate( f );
 
+        const auto initApprox = initializer(f);
         std::vector<std::vector<double>> swarm( swarmSize,
-            std::vector<double>((f.size()+1)*2));
+            std::vector<double>(2*initApprox.size()));
         std::minstd_rand rng;
         std::normal_distribution<> normal_dist;
         std::uniform_real_distribution<double> uniform(-1,1);
         for ( auto & x : swarm )
         {
-            for ( size_t i = 0; i < x.size(); i+=2 )
+            for ( size_t i = 0; i < initApprox.size(); ++i )
             {
-                x[i  ] = amplitudeDev*normal_dist(rng);
-                x[i+1] = angleDev*uniform(rng);// + i*pi/nSamples*2 + pi/2;
+                x[2*i  ] = initApprox[i].real()+amplitudeDev*normal_dist(rng);
+                x[2*i+1] = initApprox[i].imag()+angleDev*uniform(rng);
             }
         }
 
