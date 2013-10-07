@@ -136,7 +136,7 @@ void MainWindow::optimize()
         const auto initApprox = initializer(f);
         std::vector<std::vector<double>> swarm( swarmSize,
             std::vector<double>(2*initApprox.size()));
-        std::minstd_rand rng;
+        std::mt19937 rng;
         std::normal_distribution<> normal_dist;
         std::uniform_real_distribution<double> uniform(-1,1);
         for ( auto & x : swarm )
