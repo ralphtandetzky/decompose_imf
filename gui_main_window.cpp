@@ -179,8 +179,6 @@ void MainWindow::optimize()
         {
             std::cout << nIter << ' ' << cost << ' ' << std::endl;
             display(v);
-//            const int scale = 20;
-//            const int psize = v.size()*scale/2;
             const auto psize = 600.;
             const auto xscale = psize*2/(v.size()-2);
             const auto yscale = 20;

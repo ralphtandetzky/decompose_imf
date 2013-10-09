@@ -135,21 +135,12 @@ std::vector<std::complex<double>> getInitialApproximationByInterpolatingZeros(
 
     // calculate zeros and extreme values between them
     std::vector<double> zeros;
-//    std::vector<size_t> extremes = { 0 };
     for ( size_t i = 1; i != f.size(); ++i )
     {
         // crossing zero?
         if ( ( f[i-1] < 0 && 0 < f[i  ] ) ||
              ( f[i  ] < 0 && 0 < f[i-1] ) )
-        {
             zeros.push_back( i - f[i]/(f[i]-f[i-1])+0.5 );
-//            extremes.push_back( i );
-        }
-        // new extremum?
-//        else if ( abs(f[extremes.back()]) < abs(f[i]) )
-//        {
-//            extremes.back() = i;
-//        }
     }
 
     // no zeros?
@@ -158,11 +149,6 @@ std::vector<std::complex<double>> getInitialApproximationByInterpolatingZeros(
         // assign imaginary parts
         result.assign( f.size()+1,
             std::complex<double>(0,f[0]<0?-pi/2:pi/2) );
-        // assign real parts
-//        result[0].real( ln( abs( f[0]) ) );
-//        for ( size_t i = 0; i < f.size()-1; ++i)
-//            result[i+1].real( log( abs( (f[i]+f[i+1])/2 ) ) );
-//        result[f.size()].real( log( abs( f[f.size()-1]) ) );
 
         return result;
     }
