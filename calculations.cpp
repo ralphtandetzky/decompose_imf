@@ -142,7 +142,7 @@ std::vector<std::complex<double>> getInitialApproximationByInterpolatingZeros(
         if ( ( f[i-1] < 0 && 0 < f[i  ] ) ||
              ( f[i  ] < 0 && 0 < f[i-1] ) )
         {
-            zeros.push_back( i - f[i]/(f[i]-f[i-1]) + 0.5 );
+            zeros.push_back( i - f[i]/(f[i]-f[i-1]) );
 //            extremes.push_back( i );
         }
         // new extremum?
