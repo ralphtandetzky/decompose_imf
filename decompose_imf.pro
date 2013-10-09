@@ -37,7 +37,9 @@ HEADERS  += stdafx.h \
     cpp_utils/user_parameter_container.h \
     cpp_utils/cloning.h \
     qt_utils/gui_property_sheet.h \
-    cpp_utils/formula_parser.h
+    cpp_utils/formula_parser.h \
+    cpp_utils/exception.h \
+    cpp_utils/exception_handling.h
 
 SOURCES += main.cpp\
     gui_main_window.cpp \
