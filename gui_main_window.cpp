@@ -68,12 +68,13 @@ MainWindow::MainWindow(QWidget *parent)
 //                                   std::back_inserter( m->serializers ) );
     qu::createPropertySerializers( this->findChildren<QDoubleSpinBox*>(),
                                    std::back_inserter( m->serializers ) );
-//    qu::createPropertySerializers( this->findChildren<QComboBox*>(),
-//                                   std::back_inserter( m->serializers ) );
+    qu::createPropertySerializers( this->findChildren<QComboBox*>(),
+                                   std::back_inserter( m->serializers ) );
     qu::createPropertySerializers( this->findChildren<QSpinBox*>(),
                                    std::back_inserter( m->serializers ) );
     qu::createPropertySerializers( this->findChildren<QLineEdit*>(),
                                    std::back_inserter( m->serializers ) );
+
     std::ifstream file( "settings.txt" );
     readProperties( file, m->serializers );
 }
