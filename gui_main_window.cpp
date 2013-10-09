@@ -179,8 +179,11 @@ void MainWindow::optimize()
         {
             std::cout << nIter << ' ' << cost << ' ' << std::endl;
             display(v);
-            const int scale = 20;
-            const int psize = v.size()*scale/2;
+//            const int scale = 20;
+//            const int psize = v.size()*scale/2;
+            const auto psize = 600.;
+            const auto xscale = psize*2/(v.size()-2);
+            const auto yscale = 20;
             QPixmap pixmap(psize,psize);
             {
                 QPainter painter{&pixmap};
@@ -188,15 +191,15 @@ void MainWindow::optimize()
                 QPolygonF reals, imags;
                 for ( size_t i = 0; i < v.size(); i+=2 )
                 {
-                    reals << QPointF( scale*i/2, -scale*v[i  ] );
-                    imags << QPointF( scale*i/2, -scale*std::remainder(v[i+1],2*pi) );
+                    reals << QPointF( xscale*i/2, -yscale*v[i  ] );
+                    imags << QPointF( xscale*i/2, -yscale*std::remainder(v[i+1],2*pi) );
                 }
                 const auto imf = calculateImfFromPairsOfReals( v );
                 QPolygonF fPoly, imfPoly;
                 for ( size_t i = 0; i < f.size(); ++i )
                 {
-                    fPoly   << QPointF( scale*i, -scale*f  [i] );
-                    imfPoly << QPointF( scale*i, -scale*imf[i] );
+                    fPoly   << QPointF( xscale*i, -yscale*f  [i] );
+                    imfPoly << QPointF( xscale*i, -yscale*imf[i] );
                 }
                 reals  .translate(0,psize/2);
                 imags  .translate(0,psize/2);
@@ -205,8 +208,8 @@ void MainWindow::optimize()
                 painter.setRenderHint( QPainter::Antialiasing );
                 painter.setPen( Qt::darkGray );
                 painter.drawLine( 0, psize/2, psize, psize/2);
-                painter.drawLine( 0, psize/2-pi*scale, psize, psize/2-pi*scale);
-                painter.drawLine( 0, psize/2+pi*scale, psize, psize/2+pi*scale);
+                painter.drawLine( 0, psize/2-pi*yscale, psize, psize/2-pi*yscale);
+                painter.drawLine( 0, psize/2+pi*yscale, psize, psize/2+pi*yscale);
                 painter.setPen( Qt::green );
                 painter.drawPolyline( reals );
                 painter.setPen( Qt::magenta );
