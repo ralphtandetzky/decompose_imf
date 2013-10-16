@@ -39,7 +39,9 @@ HEADERS  += stdafx.h \
     qt_utils/gui_property_sheet.h \
     cpp_utils/formula_parser.h \
     cpp_utils/exception.h \
-    cpp_utils/exception_handling.h
+    cpp_utils/exception_handling.h \
+    qt_utils/exception_handling.h \
+    qt_utils/exception_handling_application.h
 
 SOURCES += main.cpp\
     gui_main_window.cpp \
@@ -49,7 +51,8 @@ SOURCES += main.cpp\
     cpp_utils/user_parameter_container.cpp \
     cpp_utils/user_parameter.cpp \
     qt_utils/gui_property_sheet.cpp \
-    cpp_utils/formula_parser.cpp
+    cpp_utils/formula_parser.cpp \
+    qt_utils/exception_handling.cpp
 
 FORMS    += \
     gui_main_window.ui

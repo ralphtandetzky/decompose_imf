@@ -1,10 +1,10 @@
 #include "gui_main_window.h"
-#include <QApplication>
+#include "qt_utils/exception_handling_application.h"
 
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    qu::ExceptionHandlingApplication a(argc, argv);
     gui::MainWindow w;
     w.show();
     
