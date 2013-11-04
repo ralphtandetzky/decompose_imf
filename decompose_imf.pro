@@ -41,7 +41,8 @@ HEADERS  += stdafx.h \
     cpp_utils/exception.h \
     cpp_utils/exception_handling.h \
     qt_utils/exception_handling.h \
-    qt_utils/exception_handling_application.h
+    qt_utils/exception_handling_application.h \
+    cpp_utils/cow_map.h
 
 SOURCES += main.cpp\
     gui_main_window.cpp \
