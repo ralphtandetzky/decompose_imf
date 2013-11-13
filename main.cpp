@@ -1,4 +1,4 @@
-/*#include "gui_main_window.h"
+#include "gui_main_window.h"
 #include "qt_utils/exception_handling_application.h"
 
 
@@ -10,8 +10,8 @@ int main(int argc, char *argv[])
     
     return a.exec();
 }
-*/
 
+/*
 #include "cpp_utils/cow_tree.h"
 #include <iostream>
 
@@ -45,3 +45,4 @@ catch( std::exception & e )
 {
     std::cout << e.what() << std::endl;
 }
+*/
