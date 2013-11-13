@@ -132,24 +132,26 @@ void MainWindow::optimize()
         using cu::pi;
         m->cancelled = false;
 
-        std::vector<double> f;
+        auto f = std::vector<double>{};
 
         for ( auto i = 0; i < nSamples; ++i )
             f.push_back( xmin + (xmax-xmin)*i/(nSamples-1) );
         f = expression->evaluate( f );
 
         const auto initApprox = initializer(f);
-        std::vector<std::vector<double>> swarm( swarmSize,
-            std::vector<double>(2*initApprox.size()));
-        std::mt19937 rng;
-        std::normal_distribution<> normal_dist;
-        std::uniform_real_distribution<double> uniform(-1,1);
-        for ( auto & x : swarm )
+        auto swarm = std::vector<std::vector<double>>( swarmSize,
+            std::vector<double>(2*initApprox.size()) );
+        auto rng = std::mt19937{};
         {
-            for ( size_t i = 0; i < initApprox.size(); ++i )
+            auto normal_dist = std::normal_distribution<>{};
+            auto uniform = std::uniform_real_distribution<double>{-1,1};
+            for ( auto & x : swarm )
             {
-                x[2*i  ] = initApprox[i].real()+amplitudeDev*normal_dist(rng);
-                x[2*i+1] = initApprox[i].imag()+angleDev*uniform(rng);
+                for ( size_t i = 0; i < initApprox.size(); ++i )
+                {
+                    x[2*i  ] = initApprox[i].real()+amplitudeDev*normal_dist(rng);
+                    x[2*i+1] = initApprox[i].imag()+angleDev*uniform(rng);
+                }
             }
         }
 
@@ -160,11 +162,11 @@ void MainWindow::optimize()
             std::cout << std::endl;
         };
 
-        int nIter = 0;
+        auto nIter = 0;
 
         const auto cost = [&f]( const std::vector<double> & v ) -> double
         {
-            for ( size_t i = 1; i < v.size(); i+=2 )
+            for ( auto i = size_t{1}; i < v.size(); i+=2 )
                 const_cast<double &>(v[i]) = remainder( v[i], 2*pi );
             return costFunction( f, v );
         };
@@ -182,19 +184,21 @@ void MainWindow::optimize()
             const auto psize = 600.;
             const auto xscale = psize*2/(v.size()-2);
             const auto yscale = 20;
-            QPixmap pixmap(psize,psize);
+            QPixmap pixmap{(int)psize,(int)psize};
             {
                 QPainter painter{&pixmap};
                 painter.fillRect(0,0,psize,psize,Qt::black);
-                QPolygonF reals, imags;
-                for ( size_t i = 0; i < v.size(); i+=2 )
+                auto reals = QPolygonF{};
+                auto imags = QPolygonF{};
+                for ( auto i = size_t{0}; i < v.size(); i+=2 )
                 {
                     reals << QPointF( xscale*i/2, -yscale*v[i  ] );
                     imags << QPointF( xscale*i/2, -yscale*std::remainder(v[i+1],2*pi) );
                 }
                 const auto imf = calculateImfFromPairsOfReals( v );
-                QPolygonF fPoly, imfPoly;
-                for ( size_t i = 0; i < f.size(); ++i )
+                auto fPoly   = QPolygonF{};
+                auto imfPoly = QPolygonF{};
+                for ( auto i = size_t{0}; i < f.size(); ++i )
                 {
                     fPoly   << QPointF( xscale*i, -yscale*f  [i] );
                     imfPoly << QPointF( xscale*i, -yscale*imf[i] );
