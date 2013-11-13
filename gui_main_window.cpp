@@ -29,8 +29,8 @@ namespace gui {
 struct MainWindow::Impl
 {
     Impl()
-        : cancelled(true)
-        , worker( 1 )
+        : cancelled{true}
+        , worker{ 1 } // create onle one thread.
     {
     }
 
@@ -38,11 +38,19 @@ struct MainWindow::Impl
     {
     }
 
+    // Contains Qt user interface elements.
     Ui::MainWindow ui;
+    // Objects which help to load the values in the gui input widgets
+    // during construction and to store them during destruction.
     std::vector<std::unique_ptr<qu::PropertySerializer>> serializers;
+    // A table of different methods which find an approximate solution
+    // to the optimization problem. The user can select the method in
+    // the gui.
     std::map<std::string,std::function<
         std::vector<std::complex<double>>(
             const std::vector<double> &)>> initializers;
+    // Holds whether the currently running optimization task (if any)
+    // has been cancelled.
     std::atomic<bool> cancelled;
     // single-threaded for background ops.
     cu::ParallelExecutor worker;
@@ -53,17 +61,21 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
     , m( std::make_unique<Impl>() )
 {
+    m->ui.setupUi(this);
+
+    // create table of functions to find initial approximations
     m->initializers["Zero"] =
         []( const std::vector<double> & f )
         { return std::vector<std::complex<double>>(f.size()+1); };
     m->initializers["Interpolate zeros"] =
         &getInitialApproximationByInterpolatingZeros;
-    m->ui.setupUi(this);
 
+    // display these methods in the gui.
     for ( const auto & initializer : m->initializers )
         m->ui.initApproxMethComboBox->addItem(
             QString::fromStdString(initializer.first) );
 
+    // set up serializers
 //    qu::createPropertySerializers( this->findChildren<QCheckBox*>(),
 //                                   std::back_inserter( m->serializers ) );
     qu::createPropertySerializers( this->findChildren<QDoubleSpinBox*>(),
@@ -75,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent)
     qu::createPropertySerializers( this->findChildren<QLineEdit*>(),
                                    std::back_inserter( m->serializers ) );
 
+    // load serialized input widget entries from a settings file.
     std::ifstream file( "settings.txt" );
     readProperties( file, m->serializers );
 }
@@ -82,7 +95,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    // stop any running optimization thread
     cancel();
+
+    // store current values from gui input widget entries.
     std::ofstream file( "settings.txt" );
     writeProperties( file, m->serializers );
 }
@@ -132,12 +148,13 @@ void MainWindow::optimize()
         using cu::pi;
         m->cancelled = false;
 
+        // calculate the target function from the expression
         auto f = std::vector<double>{};
-
         for ( auto i = 0; i < nSamples; ++i )
             f.push_back( xmin + (xmax-xmin)*i/(nSamples-1) );
         f = expression->evaluate( f );
 
+        // calculate an initial approximation and swarm
         const auto initApprox = initializer(f);
         auto swarm = std::vector<std::vector<double>>( swarmSize,
             std::vector<double>(2*initApprox.size()) );
@@ -155,15 +172,7 @@ void MainWindow::optimize()
             }
         }
 
-        auto display = []( const std::vector<double> & v )
-        {
-            for ( const auto & elem : v )
-                printf( "%5d;", int(std::round(100*elem)));
-            std::cout << std::endl;
-        };
-
-        auto nIter = 0;
-
+        // cost function for optimization
         const auto cost = [&f]( const std::vector<double> & v ) -> double
         {
             for ( auto i = size_t{1}; i < v.size(); i+=2 )
@@ -171,16 +180,27 @@ void MainWindow::optimize()
             return costFunction( f, v );
         };
 
+        // This variable is shared between 'shallTerminate' and 'sendBestFit'.
+        auto nIter = 0;
+
+        // function which returns whether the
+        // optimization algorithm shall terminate.
         const auto shallTerminate = [&]( const decltype(swarm) & )-> bool
         {
             ++nIter;
             return m->cancelled.load();
         };
 
+        // function which is called by the optimization algorithm
+        // each time the best fit is improved.
         const auto sendBestFit = [&]( const std::vector<double> & v, double cost )
         {
+            // console output
             std::cout << nIter << ' ' << cost << ' ' << std::endl;
-            display(v);
+            for ( const auto & elem : v )
+                printf( "%5d;", int(std::round(100*elem)));
+            std::cout << std::endl;
+
             const auto psize = 600.;
             const auto xscale = psize*2/(v.size()-2);
             const auto yscale = 20;
@@ -225,6 +245,7 @@ void MainWindow::optimize()
                                        Q_ARG(QPixmap,pixmap));
         };
 
+        // perform the optimization.
         swarm = cu::differentialEvolution(
             std::move(swarm), crossOverProb, diffWeight,
             cost, shallTerminate, sendBestFit, rng );
