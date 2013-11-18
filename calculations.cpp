@@ -176,3 +176,22 @@ std::vector<std::complex<double>> getInitialApproximationByInterpolatingZeros(
 
     return result;
 }
+
+
+std::vector<double>
+    getSamplesFromRadialBase(
+        const std::vector<double> & params, double sigma, size_t nSamples )
+{
+    assert( params.size() % 2 == 0 );
+    const auto jmax = params.size()/2;
+    auto result = std::vector<double>( nSamples, 0. );
+    for ( auto i = size_t{0}; i != nSamples; ++i )
+    {
+        assert( result[i] == 0 );
+        for ( auto j = size_t{0}; j != jmax; ++jmax )
+        {
+            result[i] += params[2*j] *
+                exp(-0.5*cu::sqr((i-params[2*j+1])/sigma));
+        }
+    }
+}

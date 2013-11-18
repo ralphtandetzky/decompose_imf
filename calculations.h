@@ -30,3 +30,13 @@ double boundaryCondition( std::vector<std::complex<double>> sigma_seq );
 std::vector<std::complex<double>>
     getInitialApproximationByInterpolatingZeros(
         const std::vector<double> & f );
+
+/// @l \sum_{i}p_{2i}e^{-\frac{(z-p_{2i+1})^2}{2\sigma^2}}
+std::vector<double>
+    getSamplesFromRadialBase(
+        const std::vector<double> & params, double sigma, size_t nSamples );
+
+/// @l \sum_{i}\frac{p_{2i}}{1+e^{-\frac{z-p_{2i+1}}{\tau}}}
+std::vector<double>
+    getSamplesFromLogisticFunctionBase(
+        const std::vector<double> & params, double tau, size_t nSamples );
