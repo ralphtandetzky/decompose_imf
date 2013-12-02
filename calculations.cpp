@@ -208,11 +208,11 @@ std::vector<double>
     auto result = std::vector<double>( nSamples, 0. );
     for ( auto i = size_t{0}; i != nSamples; ++i )
     {
-        assert( result[i] == 0 );
+        auto & item = result[i];
+        assert( item == 0 );
         for ( auto j = size_t{0}; j != jmax; ++j )
         {
-            result[i] =+ params[2*j] *
-                    1/(1+exp((i-params[2*j+1])/tau));
+            item += params[2*j] * 1/(1+exp((params[2*j+1]-i)/tau));
         }
     }
     return result;

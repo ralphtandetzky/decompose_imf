@@ -197,12 +197,8 @@ void MainWindow::optimize()
         {
             initApproxMat.at<double>( row ) = initApprox.at(row).imag();
         }
-        const auto invLogisticBase = cv::Mat( logisticBaseMat.inv( cv::DECOMP_SVD ) );
-        const auto bestApproxMat = cv::Mat( invLogisticBase * initApproxMat );
-//        auto bestApprox = std::vector<double>{};
-//        std::copy( bestApproxMat.begin<double>(),
-//                   bestApproxMat.end<double>(),
-//                   std::back_inserter( bestApprox ) );
+        const auto invLogisticBase = cv::Mat{ logisticBaseMat.inv( cv::DECOMP_SVD ) };
+        const auto bestApproxMat = cv::Mat{ invLogisticBase * initApproxMat };
 
         auto swarm = std::vector<std::vector<double>>( swarmSize );
         auto rng = std::mt19937{};
@@ -213,12 +209,12 @@ void MainWindow::optimize()
             {
                 for ( auto i = size_t{0}; i < nodes.size(); ++i )
                 {
-                    x.push_back( bestApproxMat.at<double>( i ) + angleDev*uniform(rng) );
+                    x.push_back( amplitudeDev*normal_dist(rng) );
                     x.push_back( nodes[i] + nodeDev*normal_dist(rng) );
                 }
                 for ( auto i = size_t{0}; i < nodes.size(); ++i )
                 {
-                    x.push_back( amplitudeDev*normal_dist(rng) );
+                    x.push_back( bestApproxMat.at<double>( i ) + angleDev*uniform(rng) );
                     x.push_back( nodes[i] );
                 }
                 x.push_back( initSigma + sigmaDev*normal_dist(rng) );
@@ -227,10 +223,10 @@ void MainWindow::optimize()
         }
 
         // cost function for optimization
-        const auto cost = [&f, nSamples]( const std::vector<double> & v ) -> double
+        const auto cost = [&f, nSamples]( std::vector<double> v ) -> double
         {
-            auto v_ = getSamplesFromParams( v, nSamples );
-            return costFunction( f, v_ );
+            return costFunction( f,
+                getSamplesFromParams( std::move(v), nSamples ) );
         };
 
         // This variable is shared between 'shallTerminate' and 'sendBestFit'.
@@ -246,8 +242,10 @@ void MainWindow::optimize()
 
         // function which is called by the optimization algorithm
         // each time the best fit is improved.
-        const auto sendBestFit = [&]( const std::vector<double> & v, double cost )
+        const auto sendBestFit = [&]( const std::vector<double> & v_, double cost )
         {
+            const auto v = getSamplesFromParams( v_, nSamples );
+
             // console output
             std::cout << nIter << ' ' << cost << ' ' << std::endl;
             for ( const auto & elem : v )
@@ -302,15 +300,6 @@ void MainWindow::optimize()
         swarm = cu::differentialEvolution(
             std::move(swarm), crossOverProb, diffWeight,
             cost, shallTerminate, sendBestFit, rng );
-
-//        swarm = nelderMead( swarm, cost, shallTerminate, sendBestFit );
-
-//        display(f);
-//        for ( const auto & row : swarm )
-//            display( calculateImfFromPairsOfReals(row) );
-//        std::cout << std::endl;
-//        for ( const auto & row : swarm )
-//            display( row );
     } );
 }
 
