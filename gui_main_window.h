@@ -16,7 +16,8 @@ public:
 private slots:
     void optimize();
     void cancel();
-    
+    void calculateNextImf();
+
 private:
     struct Impl;
     std::unique_ptr<Impl> m;

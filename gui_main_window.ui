@@ -457,6 +457,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>Next IMF</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="optimizePushButton">
        <property name="text">
         <string>Optimize</string>
@@ -490,12 +497,12 @@
    <slot>optimize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>389</x>
-     <y>648</y>
+     <x>533</x>
+     <y>439</y>
     </hint>
     <hint type="destinationlabel">
-     <x>260</x>
-     <y>393</y>
+     <x>471</x>
+     <y>392</y>
     </hint>
    </hints>
   </connection>
@@ -506,12 +513,28 @@
    <slot>cancel()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>71</x>
-     <y>648</y>
+     <x>81</x>
+     <y>439</y>
     </hint>
     <hint type="destinationlabel">
-     <x>66</x>
-     <y>394</y>
+     <x>67</x>
+     <y>385</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>gui::MainWindow</receiver>
+   <slot>calculateNextImf()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>319</x>
+     <y>422</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>275</x>
+     <y>392</y>
     </hint>
    </hints>
   </connection>
@@ -519,5 +542,6 @@
  <slots>
   <slot>optimize()</slot>
   <slot>cancel()</slot>
+  <slot>calculateNextImf()</slot>
  </slots>
 </ui>

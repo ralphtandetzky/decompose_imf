@@ -40,6 +40,10 @@ struct MainWindow::Impl
     {
     }
 
+    /////////////////////
+    // Gui thread data //
+    /////////////////////
+
     // Contains Qt user interface elements.
     Ui::MainWindow ui;
     // Objects which help to load the values in the gui input widgets
@@ -51,9 +55,24 @@ struct MainWindow::Impl
     std::map<std::string,std::function<
         std::vector<std::complex<double>>(
             const std::vector<double> &)>> initializers;
+
+
+    ///////////////////////////////////////////////
+    // Data shared between gui thread and worker //
+    ///////////////////////////////////////////////
+
     // Holds whether the currently running optimization task (if any)
     // has been cancelled.
     std::atomic<bool> cancelled;
+    // Holds whether the currently running optimization task (if any)
+    // should proceed with calculating the imf of the current residue
+    // function.
+    std::atomic<bool> shall_calculate_next_imf;
+
+    ///////////////////
+    // Worker thread //
+    ///////////////////
+
     // single-threaded for background ops.
     cu::ParallelExecutor worker;
 };
@@ -156,6 +175,7 @@ void MainWindow::optimize()
     {
         using cu::pi;
         m->cancelled = false;
+        m->shall_calculate_next_imf = false;
 
         // calculate the target function from the expression
         auto f = std::vector<double>{};
@@ -163,150 +183,182 @@ void MainWindow::optimize()
             f.push_back( xmin + (xmax-xmin)*i/(nSamples-1) );
         f = expression->evaluate( f );
 
-        // calculate an initial approximation and swarm
-        const auto initApprox = initializer(f);
+        auto done = false;
 
-        auto logisticBase = std::vector<std::vector<double>>{};
-        auto nodes = std::vector<double>{};
-        // calculate base with equidistant center points of logistic functions
-        for ( auto i = size_t{0}; i < nParams; ++i )
+        while ( !done )
         {
-            nodes.push_back( (i+.5)*initApprox.size()/nParams );
-            logisticBase.push_back( getSamplesFromLogisticFunctionBase(
-                { 1., nodes.back() }, initSigma, initApprox.size() ) );
-        }
-        auto logisticBaseMat = cv::Mat(
-                    logisticBase.front().size(), logisticBase.size(),
-                    CV_64FC1, cv::Scalar::all(0) );
-        for ( auto row = 0; row < logisticBaseMat.rows; ++row )
-        {
-            for ( auto col = 0; col < logisticBaseMat.cols; ++col )
+            // calculate an initial approximation and swarm
+            const auto initApprox = initializer(f);
+
+            // calculate base with equidistant center points of logistic functions
+            auto logisticBase = std::vector<std::vector<double>>{};
+            auto nodes = std::vector<double>{};
+            for ( auto i = size_t{0}; i < nParams; ++i )
             {
-                logisticBaseMat.at<double>(row,col) =
-                        logisticBase.at(col).at(row);
+                nodes.push_back( (i+.5)*initApprox.size()/nParams );
+                logisticBase.push_back( getSamplesFromLogisticFunctionBase(
+                    { 1., nodes.back() }, initSigma, initApprox.size() ) );
             }
-        }
-
-        // calculate the element closest to initApprox that lies in the
-        // space spanned by the base elements. Also calculate the
-        // coefficients of that minimum element with respect to the given
-        // base
-        auto initApproxMat = cv::Mat(
-                    initApprox.size(), 1, CV_64FC1, cv::Scalar::all(0) );
-        for ( auto row = 0; row < initApproxMat.rows; ++row )
-        {
-            initApproxMat.at<double>( row ) = initApprox.at(row).imag();
-        }
-        const auto invLogisticBase = cv::Mat{ logisticBaseMat.inv( cv::DECOMP_SVD ) };
-        const auto bestApproxMat = cv::Mat{ invLogisticBase * initApproxMat };
-
-        auto swarm = std::vector<std::vector<double>>( swarmSize );
-        auto rng = std::mt19937{};
-        {
-            auto normal_dist = std::normal_distribution<>{};
-            auto uniform = std::uniform_real_distribution<double>{-1,1};
-            for ( auto & x : swarm )
+            auto logisticBaseMat = cv::Mat(
+                        logisticBase.front().size(), logisticBase.size(),
+                        CV_64FC1, cv::Scalar::all(0) );
+            for ( auto row = 0; row < logisticBaseMat.rows; ++row )
             {
-                for ( auto i = size_t{0}; i < nodes.size(); ++i )
+                for ( auto col = 0; col < logisticBaseMat.cols; ++col )
                 {
-                    x.push_back( amplitudeDev*normal_dist(rng) );
-                    x.push_back( nodes[i] + nodeDev*normal_dist(rng) );
+                    logisticBaseMat.at<double>(row,col) =
+                            logisticBase.at(col).at(row);
                 }
-                for ( auto i = size_t{0}; i < nodes.size(); ++i )
-                {
-                    x.push_back( bestApproxMat.at<double>( i ) + angleDev*uniform(rng) );
-                    x.push_back( nodes[i] );
-                }
-                x.push_back( initSigma + sigmaDev*normal_dist(rng) );
-                x.push_back( initTau + tauDev*normal_dist(rng) );
             }
-        }
 
-        // cost function for optimization
-        const auto cost = [&f, nSamples]( std::vector<double> v ) -> double
-        {
-            return costFunction( f,
-                getSamplesFromParams( std::move(v), nSamples ) );
-        };
-
-        // This variable is shared between 'shallTerminate' and 'sendBestFit'.
-        auto nIter = 0;
-
-        // function which returns whether the
-        // optimization algorithm shall terminate.
-        const auto shallTerminate = [&]( const decltype(swarm) & )-> bool
-        {
-            ++nIter;
-            return m->cancelled.load();
-        };
-
-        // function which is called by the optimization algorithm
-        // each time the best fit is improved.
-        const auto sendBestFit = [&]( const std::vector<double> & v_, double cost )
-        {
-            const auto v = getSamplesFromParams( v_, nSamples );
-
-            // console output
-            std::cout << nIter << ' ' << cost << ' ' << std::endl;
-            for ( const auto & elem : v )
-                printf( "%5d;", int(std::round(100*elem)));
-            std::cout << std::endl;
-
-            const auto psize = 600.;
-            const auto xscale = psize*2/(v.size()-2);
-            const auto yscale = 20;
-            QPixmap pixmap{(int)psize,(int)psize};
+            // calculate the element closest to initApprox that lies in the
+            // space spanned by the base elements. Also calculate the
+            // coefficients of that minimum element with respect to the given
+            // base
+            auto initApproxMat = cv::Mat(
+                        initApprox.size(), 1, CV_64FC1, cv::Scalar::all(0) );
+            for ( auto row = 0; row < initApproxMat.rows; ++row )
             {
-                QPainter painter{&pixmap};
-                painter.fillRect(0,0,psize,psize,Qt::black);
-                auto reals = QPolygonF{};
-                auto imags = QPolygonF{};
-                for ( auto i = size_t{0}; i < v.size(); i+=2 )
-                {
-                    reals << QPointF( xscale*i/2, -yscale*v[i  ] );
-                    imags << QPointF( xscale*i/2, -yscale*std::remainder(v[i+1],2*pi) );
-                }
-                const auto imf = calculateImfFromPairsOfReals( v );
-                auto fPoly   = QPolygonF{};
-                auto imfPoly = QPolygonF{};
-                for ( auto i = size_t{0}; i < f.size(); ++i )
-                {
-                    fPoly   << QPointF( xscale*i, -yscale*f  [i] );
-                    imfPoly << QPointF( xscale*i, -yscale*imf[i] );
-                }
-                reals  .translate(0,psize/2);
-                imags  .translate(0,psize/2);
-                fPoly  .translate(0,psize/2);
-                imfPoly.translate(0,psize/2);
-                painter.setRenderHint( QPainter::Antialiasing );
-                painter.setPen( Qt::darkGray );
-                painter.drawLine( 0, psize/2, psize, psize/2);
-                painter.drawLine( 0, psize/2-pi*yscale, psize, psize/2-pi*yscale);
-                painter.drawLine( 0, psize/2+pi*yscale, psize, psize/2+pi*yscale);
-                painter.setPen( Qt::green );
-                painter.drawPolyline( reals );
-                painter.setPen( Qt::magenta );
-                painter.drawPolyline( imags );
-                painter.setPen( Qt::white );
-                painter.drawPolyline( fPoly );
-                painter.setPen( Qt::yellow );
-                painter.drawPolyline( imfPoly );
+                initApproxMat.at<double>( row ) = initApprox.at(row).imag();
             }
-            QMetaObject::invokeMethod( m->ui.graphDisplay, "setPixmap",
-                                       Q_ARG(QPixmap,pixmap));
-        };
+            const auto invLogisticBase =
+                    cv::Mat{ logisticBaseMat.inv( cv::DECOMP_SVD ) };
+            const auto bestApproxMat =
+                    cv::Mat{ invLogisticBase * initApproxMat };
 
-        // perform the optimization.
-        swarm = cu::differentialEvolution(
-            std::move(swarm), crossOverProb, diffWeight,
-            cost, shallTerminate, sendBestFit, rng );
-    } );
+            auto swarm = std::vector<std::vector<double>>( swarmSize );
+            auto rng = std::mt19937{};
+            {
+                auto normal_dist = std::normal_distribution<>{};
+                auto uniform = std::uniform_real_distribution<double>{-1,1};
+                for ( auto & x : swarm )
+                {
+                    for ( auto i = size_t{0}; i < nodes.size(); ++i )
+                    {
+                        x.push_back( amplitudeDev*normal_dist(rng) );
+                        x.push_back( nodes[i] + nodeDev*normal_dist(rng) );
+                    }
+                    for ( auto i = size_t{0}; i < nodes.size(); ++i )
+                    {
+                        x.push_back( bestApproxMat.at<double>( i ) +
+                                     angleDev*uniform(rng) );
+                        x.push_back( nodes[i] );
+                    }
+                    x.push_back( initSigma + sigmaDev*normal_dist(rng) );
+                    x.push_back( initTau + tauDev*normal_dist(rng) );
+                }
+            }
+
+            // cost function for optimization
+            const auto cost = [&f, nSamples]( std::vector<double> v ) -> double
+            {
+                return costFunction( f,
+                    getSamplesFromParams( std::move(v), nSamples ) );
+            };
+
+            // This variable is shared between 'shallTerminate' and 'sendBestFit'.
+            auto nIter = 0;
+
+            // function which returns whether the
+            // optimization algorithm shall terminate.
+            const auto shallTerminate = [&]( const decltype(swarm) & )-> bool
+            {
+                ++nIter;
+                if ( m->shall_calculate_next_imf.exchange( false ) )
+                {
+                    nIter = 0;
+                    return true;
+                }
+                if ( m->cancelled.load() )
+                {
+                    done = true;
+                    return true;
+                }
+                return false;
+            };
+
+            // function which is called by the optimization algorithm
+            // each time the best fit is improved.
+            auto bestParams = std::vector<double>{};
+            const auto sendBestFit = [&](
+                    const std::vector<double> & v_, double cost )
+            {
+                bestParams = v_;
+                const auto v = getSamplesFromParams( v_, nSamples );
+
+                // console output
+                std::cout << nIter << ' ' << cost << ' ' << std::endl;
+                for ( const auto & elem : v )
+                    printf( "%5d;", int(std::round(100*elem)));
+                std::cout << std::endl;
+
+                const auto psize = 600.;
+                const auto xscale = psize*2/(v.size()-2);
+                const auto yscale = 20;
+                QPixmap pixmap{(int)psize,(int)psize};
+                {
+                    QPainter painter{&pixmap};
+                    painter.fillRect(0,0,psize,psize,Qt::black);
+                    auto reals = QPolygonF{};
+                    auto imags = QPolygonF{};
+                    for ( auto i = size_t{0}; i < v.size(); i+=2 )
+                    {
+                        reals << QPointF( xscale*i/2, -yscale*v[i  ] );
+                        imags << QPointF( xscale*i/2, -yscale*std::remainder(v[i+1],2*pi) );
+                    }
+                    const auto imf = calculateImfFromPairsOfReals( v );
+                    auto fPoly   = QPolygonF{};
+                    auto imfPoly = QPolygonF{};
+                    for ( auto i = size_t{0}; i < f.size(); ++i )
+                    {
+                        fPoly   << QPointF( xscale*i, -yscale*f  [i] );
+                        imfPoly << QPointF( xscale*i, -yscale*imf[i] );
+                    }
+                    reals  .translate(0,psize/2);
+                    imags  .translate(0,psize/2);
+                    fPoly  .translate(0,psize/2);
+                    imfPoly.translate(0,psize/2);
+                    painter.setRenderHint( QPainter::Antialiasing );
+                    painter.setPen( Qt::darkGray );
+                    painter.drawLine( 0, psize/2, psize, psize/2);
+                    painter.drawLine( 0, psize/2-pi*yscale, psize, psize/2-pi*yscale);
+                    painter.drawLine( 0, psize/2+pi*yscale, psize, psize/2+pi*yscale);
+                    painter.setPen( Qt::green );
+                    painter.drawPolyline( reals );
+                    painter.setPen( Qt::magenta );
+                    painter.drawPolyline( imags );
+                    painter.setPen( Qt::white );
+                    painter.drawPolyline( fPoly );
+                    painter.setPen( Qt::yellow );
+                    painter.drawPolyline( imfPoly );
+                }
+                QMetaObject::invokeMethod( m->ui.graphDisplay, "setPixmap",
+                                           Q_ARG(QPixmap,pixmap));
+            };
+
+            // perform the optimization.
+            swarm = cu::differentialEvolution(
+                std::move(swarm), crossOverProb, diffWeight,
+                cost, shallTerminate, sendBestFit, rng );
+
+            const auto bestImf = calculateImfFromPairsOfReals(
+                        getSamplesFromParams( bestParams, nSamples ) );
+            cu::for_each( begin(f), end(f), bestImf.begin(), bestImf.end(),
+                          []( double & lhs, double rhs ){ lhs -= rhs; } );
+        } // while loop
+    } ); // task for worker
 }
 
 
 void MainWindow::cancel()
 {
     m->cancelled = true;
+}
+
+
+void MainWindow::calculateNextImf()
+{
+    m->shall_calculate_next_imf = true;
 }
 
 
