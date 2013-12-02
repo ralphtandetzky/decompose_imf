@@ -173,7 +173,7 @@ void MainWindow::optimize()
         {
             nodes.push_back( (i+.5)*initApprox.size()/nParams );
             logisticBase.push_back( getSamplesFromLogisticFunctionBase(
-                { 1., nodes.back() }, initApprox.size(), initSigma ) );
+                { 1., nodes.back() }, initSigma, initApprox.size() ) );
         }
         auto logisticBaseMat = cv::Mat(
                     logisticBase.front().size(), logisticBase.size(),
@@ -197,8 +197,8 @@ void MainWindow::optimize()
         {
             initApproxMat.at<double>( row ) = initApprox.at(row).imag();
         }
-        const auto bestApproxMat = cv::Mat(
-                    logisticBaseMat.inv( cv::DECOMP_SVD ) * initApproxMat );
+        const auto invLogisticBase = cv::Mat( logisticBaseMat.inv( cv::DECOMP_SVD ) );
+        const auto bestApproxMat = cv::Mat( invLogisticBase * initApproxMat );
 //        auto bestApprox = std::vector<double>{};
 //        std::copy( bestApproxMat.begin<double>(),
 //                   bestApproxMat.end<double>(),
@@ -229,24 +229,7 @@ void MainWindow::optimize()
         // cost function for optimization
         const auto cost = [&f, nSamples]( const std::vector<double> & v ) -> double
         {
-            auto v_ = v;
-            const auto tau   = v_.back(); v_.pop_back();
-            const auto sigma = v_.back(); v_.pop_back();
-            const auto imagV = std::vector<double>(
-                        v_.begin()+v_.size()/2, v_.end() );
-            v_.resize( v_.size()/2 );
-            const auto realPart = getSamplesFromRadialBase( v_, sigma, nSamples );
-            const auto imagPart = getSamplesFromLogisticFunctionBase( imagV, tau, nSamples );
-            v_.clear();
-
-            cu::for_each( realPart.begin(), realPart.end(),
-                          imagPart.begin(), imagPart.end(),
-                          [&v_]( const double & a, const double & b )
-            {
-                v_.push_back( a );
-                v_.push_back( remainder( b, 2*pi ) );
-            } );
-
+            auto v_ = getSamplesFromParams( v, nSamples );
             return costFunction( f, v_ );
         };
 

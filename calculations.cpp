@@ -2,6 +2,7 @@
 
 #include "cpp_utils/sqr.h"
 #include "cpp_utils/math_constants.h"
+#include "cpp_utils/more_algorithms.h"
 
 #include <algorithm>
 #include <cassert>
@@ -215,4 +216,31 @@ std::vector<double>
         }
     }
     return result;
+}
+
+
+std::vector<double> getSamplesFromParams(
+        std::vector<double> v, size_t nSamples )
+{
+//    auto v_ = v;
+    const auto tau   = v.back(); v.pop_back();
+    const auto sigma = v.back(); v.pop_back();
+    const auto imagV = std::vector<double>(
+                v.begin()+v.size()/2, v.end() );
+    v.resize( v.size()/2 );
+    const auto realPart = getSamplesFromRadialBase(
+                v, sigma, nSamples+1 );
+    const auto imagPart = getSamplesFromLogisticFunctionBase(
+                imagV, tau, nSamples+1 );
+    v.clear();
+
+    cu::for_each( realPart.begin(), realPart.end(),
+                  imagPart.begin(), imagPart.end(),
+                  [&v]( const double & a, const double & b )
+    {
+        v.push_back( a );
+        v.push_back( remainder( b, 2*cu::pi ) );
+    } );
+
+    return v;
 }

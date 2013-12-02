@@ -40,3 +40,6 @@ std::vector<double>
 std::vector<double>
     getSamplesFromLogisticFunctionBase(
         const std::vector<double> & params, double tau, size_t nSamples );
+
+std::vector<double> getSamplesFromParams(
+        std::vector<double> v , size_t nSamples );
