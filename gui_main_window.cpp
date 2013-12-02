@@ -24,6 +24,8 @@
 #include <QtGui>
 #include <QMessageBox>
 
+#include <opencv/cv.h>
+
 namespace gui {
 
 struct MainWindow::Impl
@@ -121,6 +123,13 @@ void MainWindow::optimize()
     const auto diffWeight     = m->ui.dwSpinBox       ->value();
     const auto initializer    = m->initializers.at(
                 m->ui.initApproxMethComboBox->currentText().toStdString());
+    const size_t nParams      = m->ui.nBaseFuncsSpinBox->value();
+    const auto initSigma      = m->ui.initSigmaSpinBox ->value();
+    const auto initTau        = m->ui.initTauSpinBox   ->value();
+    const auto nodeDev        = m->ui.nodeDevSpinBox   ->value();
+    const auto sigmaDev       = m->ui.sigmaDevSpinBox  ->value();
+    const auto tauDev         = m->ui.tauDevSpinBox    ->value();
+
 
     // build expression tree for target function
     const auto expression = std::make_shared<cu::ExpressionTree>();
@@ -156,28 +165,89 @@ void MainWindow::optimize()
 
         // calculate an initial approximation and swarm
         const auto initApprox = initializer(f);
-        auto swarm = std::vector<std::vector<double>>( swarmSize,
-            std::vector<double>(2*initApprox.size()) );
+
+        auto logisticBase = std::vector<std::vector<double>>{};
+        auto nodes = std::vector<double>{};
+        // calculate base with equidistant center points of logistic functions
+        for ( auto i = size_t{0}; i < nParams; ++i )
+        {
+            nodes.push_back( (i+.5)*initApprox.size()/nParams );
+            logisticBase.push_back( getSamplesFromLogisticFunctionBase(
+                { 1., nodes.back() }, initApprox.size(), initSigma ) );
+        }
+        auto logisticBaseMat = cv::Mat(
+                    logisticBase.front().size(), logisticBase.size(),
+                    CV_64FC1, cv::Scalar::all(0) );
+        for ( auto row = 0; row < logisticBaseMat.rows; ++row )
+        {
+            for ( auto col = 0; col < logisticBaseMat.cols; ++col )
+            {
+                logisticBaseMat.at<double>(row,col) =
+                        logisticBase.at(col).at(row);
+            }
+        }
+
+        // calculate the element closest to initApprox that lies in the
+        // space spanned by the base elements. Also calculate the
+        // coefficients of that minimum element with respect to the given
+        // base
+        auto initApproxMat = cv::Mat(
+                    initApprox.size(), 1, CV_64FC1, cv::Scalar::all(0) );
+        for ( auto row = 0; row < initApproxMat.rows; ++row )
+        {
+            initApproxMat.at<double>( row ) = initApprox.at(row).imag();
+        }
+        const auto bestApproxMat = cv::Mat(
+                    logisticBaseMat.inv( cv::DECOMP_SVD ) * initApproxMat );
+//        auto bestApprox = std::vector<double>{};
+//        std::copy( bestApproxMat.begin<double>(),
+//                   bestApproxMat.end<double>(),
+//                   std::back_inserter( bestApprox ) );
+
+        auto swarm = std::vector<std::vector<double>>( swarmSize );
         auto rng = std::mt19937{};
         {
             auto normal_dist = std::normal_distribution<>{};
             auto uniform = std::uniform_real_distribution<double>{-1,1};
             for ( auto & x : swarm )
             {
-                for ( size_t i = 0; i < initApprox.size(); ++i )
+                for ( auto i = size_t{0}; i < nodes.size(); ++i )
                 {
-                    x[2*i  ] = initApprox[i].real()+amplitudeDev*normal_dist(rng);
-                    x[2*i+1] = initApprox[i].imag()+angleDev*uniform(rng);
+                    x.push_back( bestApproxMat.at<double>( i ) + angleDev*uniform(rng) );
+                    x.push_back( nodes[i] + nodeDev*normal_dist(rng) );
                 }
+                for ( auto i = size_t{0}; i < nodes.size(); ++i )
+                {
+                    x.push_back( amplitudeDev*normal_dist(rng) );
+                    x.push_back( nodes[i] );
+                }
+                x.push_back( initSigma + sigmaDev*normal_dist(rng) );
+                x.push_back( initTau + tauDev*normal_dist(rng) );
             }
         }
 
         // cost function for optimization
-        const auto cost = [&f]( const std::vector<double> & v ) -> double
+        const auto cost = [&f, nSamples]( const std::vector<double> & v ) -> double
         {
-            for ( auto i = size_t{1}; i < v.size(); i+=2 )
-                const_cast<double &>(v[i]) = remainder( v[i], 2*pi );
-            return costFunction( f, v );
+            auto v_ = v;
+            const auto tau   = v_.back(); v_.pop_back();
+            const auto sigma = v_.back(); v_.pop_back();
+            const auto imagV = std::vector<double>(
+                        v_.begin()+v_.size()/2, v_.end() );
+            v_.resize( v_.size()/2 );
+            const auto realPart = getSamplesFromRadialBase( v_, sigma, nSamples );
+            const auto imagPart = getSamplesFromLogisticFunctionBase( imagV, tau, nSamples );
+            v_.clear();
+
+            cu::for_each( realPart.begin(), realPart.end(),
+                          imagPart.begin(), imagPart.end(),
+                          [&v_]( const double & a, const double & b )
+            {
+                v_.push_back( a );
+                v_.push_back( remainder( b, 2*pi ) );
+            } );
+
+            return costFunction( f, v_ );
         };
 
         // This variable is shared between 'shallTerminate' and 'sendBestFit'.
