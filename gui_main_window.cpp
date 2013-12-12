@@ -295,9 +295,9 @@ void MainWindow::optimize()
                 const auto psize = 600.;
                 const auto xscale = psize*2/(v.size()-2);
                 const auto yscale = 20;
-                QPixmap pixmap{(int)psize,(int)psize};
+                QImage image{(int)psize,(int)psize,QImage::Format_RGB32};
                 {
-                    QPainter painter{&pixmap};
+                    QPainter painter{&image};
                     painter.fillRect(0,0,psize,psize,Qt::black);
                     auto reals = QPolygonF{};
                     auto imags = QPolygonF{};
@@ -332,8 +332,8 @@ void MainWindow::optimize()
                     painter.setPen( Qt::yellow );
                     painter.drawPolyline( imfPoly );
                 }
-                QMetaObject::invokeMethod( m->ui.graphDisplay, "setPixmap",
-                                           Q_ARG(QPixmap,pixmap));
+                QMetaObject::invokeMethod( this, "setDisplay",
+                                           Q_ARG(QImage,image));
             };
 
             // perform the optimization.
@@ -361,5 +361,10 @@ void MainWindow::calculateNextImf()
     m->shall_calculate_next_imf = true;
 }
 
+
+void MainWindow::setDisplay( const QImage & image )
+{
+    m->ui.graphDisplay->setPixmap( QPixmap::fromImage(image) );
+}
 
 } // namespace gui

@@ -17,6 +17,7 @@ private slots:
     void optimize();
     void cancel();
     void calculateNextImf();
+    void setDisplay( const QImage & image );
 
 private:
     struct Impl;
