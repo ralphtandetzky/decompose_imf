@@ -4,3 +4,6 @@
 [submodule "qt_utils"]
 	path = qt_utils
 	url = git@github.com:ralphtandetzky/qt_utils.git
+[submodule "decompose_imf_notes"]
+	path = decompose_imf_notes
+	url = /media/ralph/BA0F-08DF/decompose_imf_notes/
