@@ -146,8 +146,8 @@ void MainWindow::optimize()
     const auto initSigma      = m->ui.initSigmaSpinBox ->value();
     const auto initTau        = m->ui.initTauSpinBox   ->value();
     const auto nodeDev        = m->ui.nodeDevSpinBox   ->value();
-    const auto sigmaDev       = m->ui.sigmaDevSpinBox  ->value();
-    const auto tauDev         = m->ui.tauDevSpinBox    ->value();
+    const auto sigmaDevUnits  = m->ui.sigmaDevSpinBox  ->value();
+    const auto tauDevUnits    = m->ui.tauDevSpinBox    ->value();
 
 
     // build expression tree for target function
@@ -244,6 +244,10 @@ void MainWindow::optimize()
                                      angleDev*uniform(rng) );
                         x.push_back( nodes[i] );
                     }
+                    const auto sigmaDev =
+                            sigmaDevUnits * nSamples / (xmax-xmin);
+                    const auto tauDev =
+                            tauDevUnits * nSamples / (xmax-xmin);
                     x.push_back( initSigma + sigmaDev*normal_dist(rng) );
                     x.push_back( initTau + tauDev*normal_dist(rng) );
                 }
