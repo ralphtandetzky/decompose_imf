@@ -288,9 +288,9 @@ void MainWindow::optimize()
 
                 // console output
                 std::cout << nIter << ' ' << cost << ' ' << std::endl;
-                for ( const auto & elem : v )
-                    printf( "%5d;", int(std::round(100*elem)));
-                std::cout << std::endl;
+                //for ( const auto & elem : v )
+                //    printf( "%5d;", int(std::round(100*elem)));
+                //std::cout << std::endl;
 
                 const auto psize = 600.;
                 const auto xscale = psize*2/(v.size()-2);
