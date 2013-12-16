@@ -136,16 +136,16 @@ void MainWindow::optimize()
     const auto xmax           = m->ui.xmaxSpinBox     ->value();
     const auto nSamples       = m->ui.nSamplesSpinBox ->value();
     const auto swarmSize      = m->ui.swarmSizeSpinBox->value();
-    const auto angleDev       = m->ui.angleDevSpinBox ->value()/180*cu::pi;
+    const auto angleDevDegs   = m->ui.angleDevSpinBox ->value();
     const auto amplitudeDev   = m->ui.amplDevSpinBox  ->value();
     const auto crossOverProb  = m->ui.coSpinBox       ->value();
     const auto diffWeight     = m->ui.dwSpinBox       ->value();
     const auto initializer    = m->initializers.at(
                 m->ui.initApproxMethComboBox->currentText().toStdString());
     const size_t nParams      = m->ui.nBaseFuncsSpinBox->value();
-    const auto initSigma      = m->ui.initSigmaSpinBox ->value();
-    const auto initTau        = m->ui.initTauSpinBox   ->value();
-    const auto nodeDev        = m->ui.nodeDevSpinBox   ->value();
+    const auto initSigmaUnits = m->ui.initSigmaSpinBox ->value();
+    const auto initTauUnits   = m->ui.initTauSpinBox   ->value();
+    const auto nodeDevUnits   = m->ui.nodeDevSpinBox   ->value();
     const auto sigmaDevUnits  = m->ui.sigmaDevSpinBox  ->value();
     const auto tauDevUnits    = m->ui.tauDevSpinBox    ->value();
 
@@ -193,6 +193,8 @@ void MainWindow::optimize()
             // calculate base with equidistant center points of logistic functions
             auto logisticBase = std::vector<std::vector<double>>{};
             auto nodes = std::vector<double>{};
+            const auto factor = nSamples / (xmax-xmin);
+            const auto initSigma = initSigmaUnits * factor;
             for ( auto i = size_t{0}; i < nParams; ++i )
             {
                 nodes.push_back( (i+.5)*initApprox.size()/nParams );
@@ -233,6 +235,11 @@ void MainWindow::optimize()
                 auto uniform = std::uniform_real_distribution<double>{-1,1};
                 for ( auto & x : swarm )
                 {
+                    const auto sigmaDev  = sigmaDevUnits  * factor;
+                    const auto tauDev    = tauDevUnits    * factor;
+                    const auto initTau   = initTauUnits   * factor;
+                    const auto nodeDev   = nodeDevUnits   * factor;
+                    const auto angleDev  = angleDevDegs/180*cu::pi;
                     for ( auto i = size_t{0}; i < nodes.size(); ++i )
                     {
                         x.push_back( amplitudeDev*normal_dist(rng) );
@@ -244,10 +251,6 @@ void MainWindow::optimize()
                                      angleDev*uniform(rng) );
                         x.push_back( nodes[i] );
                     }
-                    const auto sigmaDev =
-                            sigmaDevUnits * nSamples / (xmax-xmin);
-                    const auto tauDev =
-                            tauDevUnits * nSamples / (xmax-xmin);
                     x.push_back( initSigma + sigmaDev*normal_dist(rng) );
                     x.push_back( initTau + tauDev*normal_dist(rng) );
                 }
