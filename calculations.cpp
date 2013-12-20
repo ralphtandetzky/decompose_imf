@@ -28,7 +28,7 @@ std::vector<std::complex<double>>
     calculateSigmaFunctionFromSigmaSequence(
         std::vector<std::complex<double>> sigma )
 {
-    const auto pi = 3.14159265358979;
+    using cu::pi;
     const auto tau = derive( sigma );
     const auto size = sigma.size();
     for ( size_t i = 1; i < size; ++i )
@@ -99,7 +99,7 @@ std::vector<std::complex<double>>
 
 double boundaryCondition( std::vector<std::complex<double>> sigma_seq )
 {
-    const double pi = 3.14159265358979;
+    using cu::pi;
     auto tau = derive( std::move(sigma_seq) );
     for_each( begin(tau), end(tau), [pi](std::complex<double>&c)
     { c.imag( std::remainder( c.imag(), 2*pi ) ); } );
