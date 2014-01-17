@@ -101,7 +101,7 @@ double boundaryCondition( std::vector<std::complex<double>> sigma_seq )
 {
     using cu::pi;
     auto tau = derive( std::move(sigma_seq) );
-    for_each( begin(tau), end(tau), [pi](std::complex<double>&c)
+    for_each( begin(tau), end(tau), [](std::complex<double>&c)
     { c.imag( std::remainder( c.imag(), 2*pi ) ); } );
     double result = 0;
     for ( size_t i = 1; i < tau.size(); ++i )
