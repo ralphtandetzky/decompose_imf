@@ -1,5 +1,4 @@
 # C++ objects and libs
-
 *.slo
 *.lo
 *.o
@@ -11,7 +10,6 @@
 *.dylib
 
 # Qt-es
-
 *.pro.user
 *.pro.user.*
 moc_*.cpp
@@ -21,7 +19,9 @@ Makefile
 *.autosave
 
 # editor
-
 *~
 
+
+# others
 data/
+data.zip
