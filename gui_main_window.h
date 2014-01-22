@@ -17,6 +17,7 @@ private slots:
     void optimize();
     void cancel();
     void calculateNextImf();
+    void selectSamplesFile();
     void setDisplay( const QImage & image );
 
 private:

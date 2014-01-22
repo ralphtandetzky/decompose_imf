@@ -63,3 +63,6 @@ LIBS += -L/usr/local/lib/ -lopencv_core -lopencv_imgproc -lopencv_highgui
 
 OTHER_FILES += \
     notes.txt
+
+RESOURCES += \
+    resources.qrc

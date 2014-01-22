@@ -24,6 +24,8 @@
 
 #include <QtGui>
 #include <QMessageBox>
+#include <QEvent>
+#include <QFileDialog>
 
 #include <opencv/cv.h>
 
@@ -55,6 +57,8 @@ struct MainWindow::Impl
     std::map<std::string,std::function<
         std::vector<std::complex<double>>(
             const std::vector<double> &)>> initializers;
+    // A vector of samples read from a file.
+    std::vector<double> samples;
 
 
     ///////////////////////////////////////////////
@@ -115,15 +119,6 @@ MainWindow::MainWindow(QWidget *parent)
     // load serialized input widget entries from a settings file.
     std::ifstream file( "settings.txt" );
     readProperties( file, m->serializers );
-
-    qu::installEventFilter( m->ui.samplesFileLineEdit,
-        []( QObject * receiver, QEvent * event ) -> bool
-    {
-        const auto lineEdit = dynamic_cast<LineEdit*>(receiver);
-        if ( event->type() != QEvent::FocusIn )
-            return false;
-        ;
-    } );
 }
 
 
@@ -147,7 +142,7 @@ void MainWindow::optimize()
     const auto functionString = m->ui.functionLineEdit->text().toStdString();
     const auto xmin           = m->ui.xminSpinBox     ->value();
     const auto xmax           = m->ui.xmaxSpinBox     ->value();
-    const auto nSamples       = m->ui.nSamplesSpinBox ->value();
+    const auto nSamplesExpr   = m->ui.nSamplesSpinBox ->value();
     const auto swarmSize      = m->ui.swarmSizeSpinBox->value();
     const auto angleDevDegs   = m->ui.angleDevSpinBox ->value();
     const auto amplitudeDev   = m->ui.amplDevSpinBox  ->value();
@@ -183,8 +178,25 @@ void MainWindow::optimize()
         return;
     }
 
+    // calculate the target function from the expression
+    auto f = std::vector<double>{};
+    const auto tab = m->ui.samplesTabWidget->currentWidget();
+    if ( tab == m->ui.fromExpressionTab )
+    {
+        for ( auto i = 0; i < nSamplesExpr; ++i )
+            f.push_back( xmin + (xmax-xmin)*i/(nSamplesExpr-1) );
+        f = expression->evaluate( f );
+    }
+    else if ( tab == m->ui.fromFileTab )
+    {
+        f = m->samples;
+    }
+    else
+        CU_THROW( "No tab is open for selecting the samples." );
+    const auto nSamples = f.size();
+
     // concurrently launch optimization on the worker thread
-    m->worker.addTask( [=]()
+    m->worker.addTask( [=]() mutable // only f is mutated
     {
         using cu::pi;
         m->shared( []( Impl::SharedData & shared )
@@ -192,12 +204,6 @@ void MainWindow::optimize()
         	shared.cancelled = false; 
         	shared.shall_calculate_next_imf = false; 
         } );
-
-        // calculate the target function from the expression
-        auto f = std::vector<double>{};
-        for ( auto i = 0; i < nSamples; ++i )
-            f.push_back( xmin + (xmax-xmin)*i/(nSamples-1) );
-        f = expression->evaluate( f );
 
         auto done = false;
 
@@ -392,6 +398,36 @@ void MainWindow::calculateNextImf()
 	{ 
 		shared.shall_calculate_next_imf = true; 
 	} );
+}
+
+
+void MainWindow::selectSamplesFile()
+try
+{
+    const auto lineEdit = m->ui.samplesFileLineEdit;
+    const auto qFileName = QFileDialog::getOpenFileName();
+    const auto fileName = qFileName.toStdString();
+    std::ifstream file{ fileName };
+    if ( !file )
+        CU_THROW( "Could not open the file \"" + fileName + "\"." );
+    auto vals = std::vector<double>( std::istream_iterator<double>(file),
+                                     std::istream_iterator<double>() );
+    if ( file.bad() )
+        CU_THROW( "The file \"" + fileName +
+                  "\" could not be read." );
+    if ( vals.empty() )
+        CU_THROW( "The file \"" + fileName +
+                  "\" does not contain samples." );
+    if ( !file.eof() )
+        CU_THROW( "The end of the file \"" + fileName +
+                  "\" has not been reached." );
+
+    lineEdit->setText( qFileName );
+    m->samples = std::move(vals);
+}
+catch (...)
+{
+    CU_THROW( "Could not read samples file successfully." );
 }
 
 
