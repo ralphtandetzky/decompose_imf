@@ -11,6 +11,7 @@
 #include "cpp_utils/std_make_unique.h"
 #include "cpp_utils/user_parameter.h"
 
+#include "qt_utils/event_filter.h"
 #include "qt_utils/serialize_props.h"
 
 #include <array>
@@ -114,6 +115,15 @@ MainWindow::MainWindow(QWidget *parent)
     // load serialized input widget entries from a settings file.
     std::ifstream file( "settings.txt" );
     readProperties( file, m->serializers );
+
+    qu::installEventFilter( m->ui.samplesFileLineEdit,
+        []( QObject * receiver, QEvent * event ) -> bool
+    {
+        const auto lineEdit = dynamic_cast<LineEdit*>(receiver);
+        if ( event->type() != QEvent::FocusIn )
+            return false;
+        ;
+    } );
 }
 
 
