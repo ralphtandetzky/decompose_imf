@@ -31,8 +31,7 @@ namespace gui {
 struct MainWindow::Impl
 {
     Impl()
-        : cancelled{true}
-        , worker{ 1 } // create onle one thread.
+        : worker{ 1 } // create onle one thread.
     {
     }
 
@@ -61,13 +60,17 @@ struct MainWindow::Impl
     // Data shared between gui thread and worker //
     ///////////////////////////////////////////////
 
-    // Holds whether the currently running optimization task (if any)
-    // has been cancelled.
-    std::atomic<bool> cancelled;
-    // Holds whether the currently running optimization task (if any)
-    // should proceed with calculating the imf of the current residue
-    // function.
-    std::atomic<bool> shall_calculate_next_imf;
+	struct SharedData
+	{	
+	    // Holds whether the currently running optimization task (if any)
+	   	// has been cancelled.
+	   	bool cancelled = true;
+	    // Holds whether the currently running optimization task (if any)
+	    // should proceed with calculating the imf of the current residue
+	    // function.
+	    bool shall_calculate_next_imf = false;
+	};
+	cu::Monitor<SharedData> shared;
 
     ///////////////////
     // Worker thread //
@@ -174,8 +177,11 @@ void MainWindow::optimize()
     m->worker.addTask( [=]()
     {
         using cu::pi;
-        m->cancelled = false;
-        m->shall_calculate_next_imf = false;
+        m->shared( []( Impl::SharedData & shared )
+        { 
+        	shared.cancelled = false; 
+        	shared.shall_calculate_next_imf = false; 
+        } );
 
         // calculate the target function from the expression
         auto f = std::vector<double>{};
@@ -271,17 +277,21 @@ void MainWindow::optimize()
             const auto shallTerminate = [&]( const decltype(swarm) & )-> bool
             {
                 ++nIter;
-                if ( m->shall_calculate_next_imf.exchange( false ) )
+                return m->shared( [&]( Impl::SharedData & shared ) -> bool
                 {
-                    nIter = 0;
-                    return true;
-                }
-                if ( m->cancelled.load() )
-                {
-                    done = true;
-                    return true;
-                }
-                return false;
+                	if ( shared.shall_calculate_next_imf )
+                	{
+                		shared.shall_calculate_next_imf = false;
+                		nIter = 0;
+                		return true;
+                	}
+                	if ( shared.cancelled )
+                	{
+                		done = true;
+                		return true;
+                	}
+                	return false;
+                } );
             };
 
             // function which is called by the optimization algorithm
@@ -359,13 +369,19 @@ void MainWindow::optimize()
 
 void MainWindow::cancel()
 {
-    m->cancelled = true;
+	m->shared( []( Impl::SharedData & shared )
+	{ 
+		shared.cancelled = true; 
+	} );
 }
 
 
 void MainWindow::calculateNextImf()
 {
-    m->shall_calculate_next_imf = true;
+	m->shared( []( Impl::SharedData & shared )
+	{ 
+		shared.shall_calculate_next_imf = true; 
+	} );
 }
 
 
