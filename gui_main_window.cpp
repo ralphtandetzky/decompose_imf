@@ -190,6 +190,12 @@ void MainWindow::optimize()
     else if ( tab == m->ui.fromFileTab )
     {
         f = m->samples;
+        for ( auto i = 0; i < 4; ++i )
+        {
+            for ( auto j = size_t{0}; j+3 < f.size(); ++j )
+                f[j] = (f[j]+f[j+1]+f[j+2]+f[j+3])/4;
+            f.resize( f.size()-3 );
+        }
     }
     else
         CU_THROW( "No tab is open for selecting the samples." );
