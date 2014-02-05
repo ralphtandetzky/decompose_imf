@@ -432,6 +432,8 @@ try
 
     lineEdit->setText( qFileName );
     m->samples = std::move(vals);
+    m->ui.fileInfoTextBrowser->setText(
+                QString("The number of samples is %1.").arg(m->samples.size()));
 }
 catch (...)
 {
