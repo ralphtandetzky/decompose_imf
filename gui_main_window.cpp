@@ -412,6 +412,8 @@ try
 {
     const auto lineEdit = m->ui.samplesFileLineEdit;
     const auto qFileName = QFileDialog::getOpenFileName();
+    if ( qFileName.isNull() ) // user cancelled?
+        return;
     const auto fileName = qFileName.toStdString();
     std::ifstream file{ fileName };
     if ( !file )
