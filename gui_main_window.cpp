@@ -13,6 +13,7 @@
 
 #include "qt_utils/event_filter.h"
 #include "qt_utils/exception_handling.h"
+#include "qt_utils/invoke_in_thread.h"
 #include "qt_utils/serialize_props.h"
 
 #include <array>
@@ -435,26 +436,35 @@ catch (...)
 
 void MainWindow::readSamplesFile( const QString & qFileName )
 {
-    const auto fileName = qFileName.toStdString();
-    std::ifstream file{ fileName };
-    if ( !file )
-        CU_THROW( "Could not open the file \"" + fileName + "\"." );
-    auto vals = std::vector<double>( std::istream_iterator<double>(file),
-                                     std::istream_iterator<double>() );
-    if ( file.bad() )
-        CU_THROW( "The file \"" + fileName +
-                  "\" could not be read." );
-    if ( vals.empty() )
-        CU_THROW( "The file \"" + fileName +
-                  "\" does not contain samples." );
-    if ( !file.eof() )
-        CU_THROW( "The end of the file \"" + fileName +
-                  "\" has not been reached." );
+    cancel();
+    m->worker.addTask( [=]()
+    {
+    QU_HANDLE_ALL_EXCEPTIONS_FROM
+    {
+        const auto fileName = qFileName.toStdString();
+        std::ifstream file{ fileName };
+        if ( !file )
+            CU_THROW( "Could not open the file \"" + fileName + "\"." );
+        auto vals = std::vector<double>( std::istream_iterator<double>(file),
+                                         std::istream_iterator<double>() );
+        if ( file.bad() )
+            CU_THROW( "The file \"" + fileName +
+                      "\" could not be read." );
+        if ( vals.empty() )
+            CU_THROW( "The file \"" + fileName +
+                      "\" does not contain samples." );
+        if ( !file.eof() )
+            CU_THROW( "The end of the file \"" + fileName +
+                      "\" has not been reached." );
 
-    m->ui.samplesFileLineEdit->setText( qFileName );
-    m->samples = std::move(vals);
-    m->ui.fileInfoTextBrowser->setText(
-                QString("The number of samples is %1.").arg(m->samples.size()));
+        qu::invokeInGuiThreadAsync( [=]()
+        {
+            m->ui.samplesFileLineEdit->setText( qFileName );
+            m->samples = std::move(vals);
+            m->ui.fileInfoTextBrowser->setText(
+                        QString("The number of samples is %1.").arg(m->samples.size()));
+        } );
+    }; } );
 }
 
 
