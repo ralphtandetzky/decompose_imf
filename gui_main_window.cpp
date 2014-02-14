@@ -12,6 +12,7 @@
 #include "cpp_utils/user_parameter.h"
 
 #include "qt_utils/event_filter.h"
+#include "qt_utils/exception_handling.h"
 #include "qt_utils/serialize_props.h"
 
 #include <array>
@@ -119,6 +120,14 @@ MainWindow::MainWindow(QWidget *parent)
     // load serialized input widget entries from a settings file.
     std::ifstream file( "settings.txt" );
     readProperties( file, m->serializers );
+
+    // open the file in the samples file line edit, if any.
+    const auto samplesFileName = m->ui.samplesFileLineEdit->text();
+    if ( !samplesFileName.isEmpty() )
+        QU_HANDLE_ALL_EXCEPTIONS_FROM {
+            readSamplesFile( samplesFileName );
+        };
+
 }
 
 
@@ -189,13 +198,16 @@ void MainWindow::optimize()
     }
     else if ( tab == m->ui.fromFileTab )
     {
+        if ( m->samples.empty() )
+            CU_THROW( "Cannot start search, because there were no samples "
+                      "read from any file. Please select a file first." );
         f = m->samples;
-        for ( auto i = 0; i < 4; ++i )
+/*        for ( auto i = 0; i < 4; ++i )
         {
             for ( auto j = size_t{0}; j+3 < f.size(); ++j )
                 f[j] = (f[j]+f[j+1]+f[j+2]+f[j+3])/4;
             f.resize( f.size()-3 );
-        }
+        }*/
     }
     else
         CU_THROW( "No tab is open for selecting the samples." );
@@ -410,10 +422,19 @@ void MainWindow::calculateNextImf()
 void MainWindow::selectSamplesFile()
 try
 {
-    const auto lineEdit = m->ui.samplesFileLineEdit;
     const auto qFileName = QFileDialog::getOpenFileName();
     if ( qFileName.isNull() ) // user cancelled?
         return;
+    readSamplesFile( qFileName );
+}
+catch (...)
+{
+    CU_THROW( "Could not read samples file successfully." );
+}
+
+
+void MainWindow::readSamplesFile( const QString & qFileName )
+{
     const auto fileName = qFileName.toStdString();
     std::ifstream file{ fileName };
     if ( !file )
@@ -430,14 +451,10 @@ try
         CU_THROW( "The end of the file \"" + fileName +
                   "\" has not been reached." );
 
-    lineEdit->setText( qFileName );
+    m->ui.samplesFileLineEdit->setText( qFileName );
     m->samples = std::move(vals);
     m->ui.fileInfoTextBrowser->setText(
                 QString("The number of samples is %1.").arg(m->samples.size()));
-}
-catch (...)
-{
-    CU_THROW( "Could not read samples file successfully." );
 }
 
 

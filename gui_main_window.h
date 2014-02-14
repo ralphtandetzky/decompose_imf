@@ -18,6 +18,7 @@ private slots:
     void cancel();
     void calculateNextImf();
     void selectSamplesFile();
+    void readSamplesFile(const QString & qFileName );
     void setDisplay( const QImage & image );
 
 private:
