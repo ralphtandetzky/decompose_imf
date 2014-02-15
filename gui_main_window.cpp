@@ -45,6 +45,63 @@ struct MainWindow::Impl
     {
     }
 
+    // Creates functions to find initial approximations and
+    // registers them in the gui.
+    void setInitializers()
+    {
+        // create table of functions to find initial approximations
+        initializers["Zero"] =
+            []( const std::vector<double> & f )
+            { return std::vector<std::complex<double>>(f.size()+1); };
+        initializers["Interpolate zeros"] =
+            &getInitialApproximationByInterpolatingZeros;
+
+        // display these methods in the gui.
+        for ( const auto & initializer : initializers )
+            ui.initApproxMethComboBox->addItem(
+                QString::fromStdString(initializer.first) );
+    }
+
+    // Creates a table of preprocessing functions.
+    void setPreprocessors()
+    {
+        preprocessors["mul"] =
+            []( const std::vector<double> & args, std::vector<double> samples )
+        {
+            if ( args.size() != 1 )
+                CU_THROW( "The 'box_blur' preprocessing step expects "
+                          "exactly one argument, not " +
+                          std::to_string(args.size()) + "." );
+            const auto factor = args.front();
+            std::for_each( begin(samples), end(samples),
+                           [&]( double & s ){ s *= factor; } );
+            return samples;
+        };
+        preprocessors["box_blur"] =
+            []( const std::vector<double> & args, std::vector<double> samples )
+        {
+            if ( args.size() != 1 )
+                CU_THROW( "The 'box_blur' preprocessing step expects "
+                          "exactly one argument, not " +
+                          std::to_string(args.size()) + "." );
+            const auto width = size_t(args.front()+0.5);
+            if ( width == 0 )
+                CU_THROW( "Zero width is not a valid argument for the "
+                          "box_blur preprocessing step." );
+            const auto nSamples = samples.size();
+            if ( width >= nSamples )
+                CU_THROW( "Width " + std::to_string(width)+ " of box_blur "
+                          "is too large for " + std::to_string(nSamples) +
+                          " samples." );
+            std::partial_sum( begin(samples), end(samples), begin(samples) );
+            samples.insert( begin(samples), 0 );
+            for ( auto i = size_t{0}; i + width < samples.size(); ++i )
+                samples[i] = ( samples[i+width] - samples[i] ) / width;
+            samples.resize( nSamples+1-width );
+            return samples;
+        };
+    }
+
     /////////////////////
     // Gui thread data //
     /////////////////////
@@ -60,6 +117,8 @@ struct MainWindow::Impl
     std::map<std::string,std::function<
         std::vector<std::complex<double>>(
             const std::vector<double> &)>> initializers;
+    // A table of different preprocessing functions that can be applied
+    // to a bunch of input samples.
     std::map<std::string,std::function<
         std::vector<double>(
             const std::vector<double> args,
@@ -98,51 +157,8 @@ MainWindow::MainWindow(QWidget *parent)
     , m( std::make_unique<Impl>() )
 {
     m->ui.setupUi(this);
-
-    // create table of functions to find initial approximations
-    m->initializers["Zero"] =
-        []( const std::vector<double> & f )
-        { return std::vector<std::complex<double>>(f.size()+1); };
-    m->initializers["Interpolate zeros"] =
-        &getInitialApproximationByInterpolatingZeros;
-
-    // display these methods in the gui.
-    for ( const auto & initializer : m->initializers )
-        m->ui.initApproxMethComboBox->addItem(
-            QString::fromStdString(initializer.first) );
-
-    // create table of preprocessing functions
-    m->preprocessors["mul"] =
-        []( const std::vector<double> & args, std::vector<double> samples )
-    {
-        if ( args.size() != 1 )
-            CU_THROW( "The 'box_blur' preprocessing step expects "
-                      "exactly one argument, not " +
-                      std::to_string(args.size()) + "." );
-        const auto factor = args.front();
-        std::for_each( begin(samples), end(samples),
-                       [&]( double & s ){ s *= factor; } );
-        return samples;
-    };
-    m->preprocessors["box_blur"] =
-        []( const std::vector<double> & args, std::vector<double> samples )
-    {
-        if ( args.size() != 1 )
-            CU_THROW( "The 'box_blur' preprocessing step expects "
-                      "exactly one argument, not " +
-                      std::to_string(args.size()) + "." );
-        const auto width = size_t(args.front()+0.5);
-        const auto nSamples = samples.size();
-        if ( width >= nSamples )
-            CU_THROW( "Width " + std::to_string(width)+ " of box_blur "
-                      "is too large for " + std::to_string(nSamples) +
-                      " samples." );
-        std::partial_sum( begin(samples), end(samples), begin(samples) );
-        for ( auto i = size_t{0}; i + width < samples.size(); ++i )
-            samples[i] = ( samples[i+width] - samples[i] ) / width;
-        samples.resize( nSamples-width );
-        return samples;
-    };
+    m->setInitializers();
+    m->setPreprocessors();
 
     // set up serializers
 //    qu::createPropertySerializers( this->findChildren<QCheckBox*>(),
