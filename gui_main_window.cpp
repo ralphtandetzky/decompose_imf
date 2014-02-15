@@ -101,10 +101,11 @@ struct MainWindow::Impl
                 CU_THROW( "The second argument of 'clip' must be "
                           "greater than the first one. "
                           "The first argument is " + std::to_string(first) +
-                          "and the second is" + std::to_string(last) );
+                          " and the second is " + std::to_string(last) +
+                          "." );
             if ( last > samples.size() )
                 CU_THROW( "The upper bound " + std::to_string(last) +
-                          "is greater than the number of samples " +
+                          " is greater than the number of samples " +
                           std::to_string(samples.size()) + "." );
             return std::vector<double>( samples.begin()+first,
                                         samples.begin()+last );
@@ -367,7 +368,7 @@ void MainWindow::optimize()
                         }
                     }
                     // no appropriate match?
-                    if ( minDist == preprocessor.size() )
+                    if ( minDistName.empty() )
                         CU_THROW( message );
                     CU_THROW( message + " Did you mean '" +
                               minDistName + "'?" );
