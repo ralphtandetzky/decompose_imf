@@ -350,8 +350,28 @@ void MainWindow::optimize()
                 std::string preprocessor;
                 is >> preprocessor;
                 if ( m->preprocessors.count(preprocessor) == 0 )
-                    CU_THROW( "The preprocessing function '" + preprocessor +
-                              "' is unknown." );
+                {
+                    const auto message =
+                            "The preprocessing function '" + preprocessor +
+                            "' is unknown.";
+                    auto minDist = preprocessor.size() / 2 + 1;
+                    auto minDistName = std::string{};
+                    for ( const auto & x : m->preprocessors )
+                    {
+                        const auto dist = cu::levenshteinDistance(
+                                    preprocessor, x.first );
+                        if ( dist < minDist )
+                        {
+                            minDist = dist;
+                            minDistName = x.first;
+                        }
+                    }
+                    // no appropriate match?
+                    if ( minDist == preprocessor.size() )
+                        CU_THROW( message );
+                    CU_THROW( message + " Did you mean '" +
+                              minDistName + "'?" );
+                }
                 std::vector<double> args;
                 std::copy( std::istream_iterator<double>(is),
                            std::istream_iterator<double>(),
