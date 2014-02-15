@@ -65,23 +65,11 @@ struct MainWindow::Impl
     // Creates a table of preprocessing functions.
     void setPreprocessors()
     {
-        preprocessors["mul"] =
+        preprocessors["box_filter"] =
             []( const std::vector<double> & args, std::vector<double> samples )
         {
             if ( args.size() != 1 )
-                CU_THROW( "The 'box_blur' preprocessing step expects "
-                          "exactly one argument, not " +
-                          std::to_string(args.size()) + "." );
-            const auto factor = args.front();
-            std::for_each( begin(samples), end(samples),
-                           [&]( double & s ){ s *= factor; } );
-            return samples;
-        };
-        preprocessors["box_blur"] =
-            []( const std::vector<double> & args, std::vector<double> samples )
-        {
-            if ( args.size() != 1 )
-                CU_THROW( "The 'box_blur' preprocessing step expects "
+                CU_THROW( "The 'box_filter' preprocessing step expects "
                           "exactly one argument, not " +
                           std::to_string(args.size()) + "." );
             const auto width = size_t(args.front()+0.5);
@@ -98,6 +86,39 @@ struct MainWindow::Impl
             for ( auto i = size_t{0}; i + width < samples.size(); ++i )
                 samples[i] = ( samples[i+width] - samples[i] ) / width;
             samples.resize( nSamples+1-width );
+            return samples;
+        };
+        preprocessors["clip"] =
+            []( const std::vector<double> & args, std::vector<double> samples )
+        {
+            if ( args.size() != 2 )
+                CU_THROW( "The 'sub_interval' preprocessing step expects "
+                          "exactly two arguments, not " +
+                          std::to_string(args.size()) + "." );
+            const auto first = size_t(args[0]+0.5);
+            const auto last  = size_t(args[1]+0.5);
+            if ( first >= last )
+                CU_THROW( "The second argument of 'sub_interval' must be "
+                          "greater than the first one. "
+                          "The first argument is " + std::to_string(first) +
+                          "and the second is" + std::to_string(last) );
+            if ( last > samples.size() )
+                CU_THROW( "The upper bound " + std::to_string(last) +
+                          "is greater than the number of samples " +
+                          std::to_string(samples.size()) + "." );
+            return std::vector<double>( samples.begin()+first,
+                                        samples.begin()+last );
+        };
+        preprocessors["mul"] =
+            []( const std::vector<double> & args, std::vector<double> samples )
+        {
+            if ( args.size() != 1 )
+                CU_THROW( "The 'mul' preprocessing step expects "
+                          "exactly one argument, not " +
+                          std::to_string(args.size()) + "." );
+            const auto factor = args.front();
+            std::for_each( begin(samples), end(samples),
+                           [&]( double & s ){ s *= factor; } );
             return samples;
         };
     }
