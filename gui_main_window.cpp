@@ -246,6 +246,8 @@ MainWindow::MainWindow(QWidget *parent)
                                    std::back_inserter( m->serializers ) );
     qu::createPropertySerializers( this->findChildren<QPlainTextEdit*>(),
                                    std::back_inserter( m->serializers ) );
+    qu::createPropertySerializers( this->findChildren<QTabWidget*>(),
+                                   std::back_inserter( m->serializers ) );
 
     // load serialized input widget entries from a settings file.
     std::ifstream file( "settings.txt" );
