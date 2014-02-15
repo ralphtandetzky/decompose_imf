@@ -124,6 +124,25 @@ MainWindow::MainWindow(QWidget *parent)
                        [&]( double & s ){ s *= factor; } );
         return samples;
     };
+    m->preprocessors["box_blur"] =
+        []( const std::vector<double> & args, std::vector<double> samples )
+    {
+        if ( args.size() != 1 )
+            CU_THROW( "The 'box_blur' preprocessing step expects "
+                      "exactly one argument, not " +
+                      std::to_string(args.size()) + "." );
+        const auto width = size_t(args.front()+0.5);
+        const auto nSamples = samples.size();
+        if ( width >= nSamples )
+            CU_THROW( "Width " + std::to_string(width)+ " of box_blur "
+                      "is too large for " + std::to_string(nSamples) +
+                      " samples." );
+        std::partial_sum( begin(samples), end(samples), begin(samples) );
+        for ( auto i = size_t{0}; i + width < samples.size(); ++i )
+            samples[i] = ( samples[i+width] - samples[i] ) / width;
+        samples.resize( nSamples-width );
+        return samples;
+    };
 
     // set up serializers
 //    qu::createPropertySerializers( this->findChildren<QCheckBox*>(),
