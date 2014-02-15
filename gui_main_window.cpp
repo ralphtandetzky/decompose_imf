@@ -3,6 +3,7 @@
 
 #include "calculations.h"
 
+#include "cpp_utils/extract_by_line.h"
 #include "cpp_utils/formula_parser.h"
 #include "cpp_utils/math_constants.h"
 #include "cpp_utils/optimize.h"
@@ -59,6 +60,10 @@ struct MainWindow::Impl
     std::map<std::string,std::function<
         std::vector<std::complex<double>>(
             const std::vector<double> &)>> initializers;
+    std::map<std::string,std::function<
+        std::vector<double>(
+            const std::vector<double> args,
+            std::vector<double> samples)>> preprocessors;
     // A vector of samples read from a file.
     std::vector<double> samples;
 
@@ -105,6 +110,20 @@ MainWindow::MainWindow(QWidget *parent)
     for ( const auto & initializer : m->initializers )
         m->ui.initApproxMethComboBox->addItem(
             QString::fromStdString(initializer.first) );
+
+    // create table of preprocessing functions
+    m->preprocessors["mul"] =
+        []( const std::vector<double> & args, std::vector<double> samples )
+    {
+        if ( args.size() != 1 )
+            CU_THROW( "The 'box_blur' preprocessing step expects "
+                      "exactly one argument, not " +
+                      std::to_string(args.size()) + "." );
+        const auto factor = args.front();
+        std::for_each( begin(samples), end(samples),
+                       [&]( double & s ){ s *= factor; } );
+        return samples;
+    };
 
     // set up serializers
 //    qu::createPropertySerializers( this->findChildren<QCheckBox*>(),
@@ -168,6 +187,8 @@ void MainWindow::optimize()
     const auto nodeDevUnits   = m->ui.nodeDevSpinBox   ->value();
     const auto sigmaDevUnits  = m->ui.sigmaDevSpinBox  ->value();
     const auto tauDevUnits    = m->ui.tauDevSpinBox    ->value();
+    const auto preprocessing  = cu::extractByLine( std::istringstream(
+                m->ui.preprocessingTextEdit->toPlainText().toStdString() ) );
 
 
     // build expression tree for target function
@@ -205,15 +226,45 @@ void MainWindow::optimize()
             CU_THROW( "Cannot start search, because there were no samples "
                       "read from any file. Please select a file first." );
         f = m->samples;
-/*        for ( auto i = 0; i < 4; ++i )
-        {
-            for ( auto j = size_t{0}; j+3 < f.size(); ++j )
-                f[j] = (f[j]+f[j+1]+f[j+2]+f[j+3])/4;
-            f.resize( f.size()-3 );
-        }*/
     }
     else
         CU_THROW( "No tab is open for selecting the samples." );
+
+    try
+    {
+        for ( auto line : preprocessing )
+        {
+            try
+            {
+                line = cu::trim( line );
+                if ( line.empty() )
+                    continue;
+                std::istringstream is(line);
+                std::string preprocessor;
+                is >> preprocessor;
+                if ( m->preprocessors.count(preprocessor) == 0 )
+                    CU_THROW( "The preprocessor '" + preprocessor +
+                              "' is unknown." );
+                std::vector<double> args;
+                std::copy( std::istream_iterator<double>(is),
+                           std::istream_iterator<double>(),
+                           std::back_inserter(args) );
+                if ( !is.eof() )
+                    CU_THROW( "Could not parse the arguments up until "
+                              "the end of the line." );
+                f = m->preprocessors[preprocessor](args,f);
+            }
+            catch (...)
+            {
+                CU_THROW( "The line '" + line + "' could not be parsed." );
+            }
+        }
+    }
+    catch (...)
+    {
+        CU_THROW( "Preprocessing steps could not be interpreted. " );
+    }
+
     const auto nSamples = f.size();
 
     // concurrently launch optimization on the worker thread
