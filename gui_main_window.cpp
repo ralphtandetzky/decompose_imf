@@ -278,7 +278,7 @@ void MainWindow::optimize()
                 std::string preprocessor;
                 is >> preprocessor;
                 if ( m->preprocessors.count(preprocessor) == 0 )
-                    CU_THROW( "The preprocessor '" + preprocessor +
+                    CU_THROW( "The preprocessing function '" + preprocessor +
                               "' is unknown." );
                 std::vector<double> args;
                 std::copy( std::istream_iterator<double>(is),
@@ -291,13 +291,13 @@ void MainWindow::optimize()
             }
             catch (...)
             {
-                CU_THROW( "The line '" + line + "' could not be parsed." );
+                CU_THROW( "The line '" + line + "' could not be executed." );
             }
         }
     }
     catch (...)
     {
-        CU_THROW( "Preprocessing steps could not be interpreted. " );
+        CU_THROW( "Preprocessing the input samples failed. " );
     }
 
     const auto nSamples = f.size();
