@@ -75,10 +75,10 @@ struct MainWindow::Impl
             const auto width = size_t(args.front()+0.5);
             if ( width == 0 )
                 CU_THROW( "Zero width is not a valid argument for the "
-                          "box_blur preprocessing step." );
+                          "box_filter preprocessing step." );
             const auto nSamples = samples.size();
             if ( width >= nSamples )
-                CU_THROW( "Width " + std::to_string(width)+ " of box_blur "
+                CU_THROW( "Width " + std::to_string(width)+ " of box_filter "
                           "is too large for " + std::to_string(nSamples) +
                           " samples." );
             std::partial_sum( begin(samples), end(samples), begin(samples) );
@@ -92,13 +92,13 @@ struct MainWindow::Impl
             []( const std::vector<double> & args, std::vector<double> samples )
         {
             if ( args.size() != 2 )
-                CU_THROW( "The 'sub_interval' preprocessing step expects "
+                CU_THROW( "The 'clip' preprocessing step expects "
                           "exactly two arguments, not " +
                           std::to_string(args.size()) + "." );
             const auto first = size_t(args[0]+0.5);
             const auto last  = size_t(args[1]+0.5);
             if ( first >= last )
-                CU_THROW( "The second argument of 'sub_interval' must be "
+                CU_THROW( "The second argument of 'clip' must be "
                           "greater than the first one. "
                           "The first argument is " + std::to_string(first) +
                           "and the second is" + std::to_string(last) );
