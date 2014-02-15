@@ -121,6 +121,20 @@ struct MainWindow::Impl
                            [&]( double & s ){ s *= factor; } );
             return samples;
         };
+        preprocessors["zero_average"] =
+            []( const std::vector<double> & args, std::vector<double> samples )
+        {
+            if ( args.size() != 0 )
+                CU_THROW( "The 'zero_average' preprocessing step expects "
+                          "no arguments, but " +
+                          std::to_string(args.size()) + " have been passed." );
+            const auto average =
+                    std::accumulate( begin(samples),
+                                     end(samples), 0. ) / samples.size();
+            std::for_each( begin(samples), end(samples),
+                           [&]( double & s ){ s -= average; } );
+            return samples;
+        };
     }
 
     /////////////////////
