@@ -109,6 +109,26 @@ struct MainWindow::Impl
             return std::vector<double>( samples.begin()+first,
                                         samples.begin()+last );
         };
+        preprocessors["low_pass"] =
+            []( const std::vector<double> & args, std::vector<double> samples )
+        {
+            if ( args.size() != 1 )
+                CU_THROW( "The 'low_pass' preprocessing step expects "
+                          "exactly one argument, not " +
+                          std::to_string(args.size()) + "." );
+            const auto factor = args.front();
+            if ( factor <= 0 )
+                CU_THROW( "Invalid argument " + std::to_string(factor) +
+                          " for 'low_pass'. Argument must be positive." );
+            const auto rec = 1./(1.+factor);
+            auto samples2 = samples;
+            double x = 0.;
+            const auto lambda = [&]( double & s ) { s = x = (s+factor*x)*rec; };
+            x = samples.front();
+            std::for_each( samples. begin(), samples. end(), lambda );
+            std::for_each( samples.rbegin(), samples.rend(), lambda );
+            return samples;
+        };
         preprocessors["mul"] =
             []( const std::vector<double> & args, std::vector<double> samples )
         {
