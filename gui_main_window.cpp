@@ -198,6 +198,7 @@ struct MainWindow::Impl
             std::vector<double> samples)>> preprocessors;
     // A vector of samples read from a file.
     std::vector<double> samples;
+    std::unique_ptr<QLabel> graphDisplay;
 
 
     ///////////////////////////////////////////////
@@ -230,6 +231,17 @@ MainWindow::MainWindow(QWidget *parent)
     , m( std::make_unique<Impl>() )
 {
     m->ui.setupUi(this);
+
+    m->graphDisplay = std::make_unique<QLabel>();
+    qu::installEventFilter( this, [this]( QObject *, QEvent * event )
+    {
+        if ( event->type() == QEvent::Close )
+            QApplication::quit();
+        return false;
+    });
+    m->graphDisplay->setWindowFlags(
+        m->graphDisplay->windowFlags() & ~Qt::WindowMaximizeButtonHint );
+
     m->setInitializers();
     m->setPreprocessors();
 
@@ -396,6 +408,7 @@ void MainWindow::optimize()
     }
 
     const auto nSamples = f.size();
+    m->graphDisplay->show();
 
     // concurrently launch optimization on the worker thread
     m->worker.addTask( [=]() mutable // only f is mutated
@@ -654,7 +667,8 @@ void MainWindow::readSamplesFile( const QString & qFileName )
 
 void MainWindow::setDisplay( const QImage & image )
 {
-    m->ui.graphDisplay->setPixmap( QPixmap::fromImage(image) );
+    m->graphDisplay->resize( image.size() );
+    m->graphDisplay->setPixmap( QPixmap::fromImage(image) );
 }
 
 } // namespace gui

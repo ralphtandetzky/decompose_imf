@@ -14,17 +14,17 @@
    <string>Decompose IMF</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>12</number>
+   </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="bottomMargin">
-        <number>10</number>
-       </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1">
        <item>
         <widget class="QTabWidget" name="samplesTabWidget">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="fromExpressionTab">
           <attribute name="title">
@@ -147,7 +147,7 @@
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
-               <height>15</height>
+               <height>0</height>
               </size>
              </property>
             </spacer>
@@ -243,7 +243,7 @@
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
-               <height>9</height>
+               <height>6</height>
               </size>
              </property>
             </spacer>
@@ -257,24 +257,23 @@
          <property name="title">
           <string>Preprocessing Steps</string>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPlainTextEdit" name="preprocessingTextEdit">
-         <property name="tabChangesFocus">
-          <bool>true</bool>
-         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QPlainTextEdit" name="preprocessingTextEdit">
+            <property name="tabChangesFocus">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_5">
-       <property name="leftMargin">
-        <number>10</number>
-       </property>
-       <property name="topMargin">
-        <number>10</number>
+       <property name="spacing">
+        <number>0</number>
        </property>
        <item>
         <widget class="QGroupBox" name="groupBox_3">
@@ -343,6 +342,22 @@
           </item>
          </layout>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>6</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item>
         <widget class="QGroupBox" name="groupBox_2">
@@ -579,35 +594,6 @@
       </layout>
      </item>
     </layout>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
-    <widget class="QLabel" name="graphDisplay"/>
-   </item>
-   <item>
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
