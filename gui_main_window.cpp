@@ -197,6 +197,8 @@ void MainWindow::optimize()
     const auto tauDevUnits    = m->ui.tauDevSpinBox    ->value();
     const auto preprocessing  = m->ui.preprocessingTextEdit
             ->toPlainText().toStdString();
+    const auto interprocessing= m->ui.interprocessingTextEdit
+            ->toPlainText().toStdString();
 
     // build expression tree for target function
     const auto expression = std::make_shared<cu::ExpressionTree>();
@@ -254,10 +256,11 @@ void MainWindow::optimize()
         auto done = false;
 
         const auto processingFunctions = createProcessingFunctions();
-        f = processSamples( f, preprocessing, processingFunctions );
+        auto residue = processSamples( f, preprocessing, processingFunctions );
 
         while ( !done )
         {
+            f = processSamples( residue, interprocessing, processingFunctions );
             const auto nSamples = f.size();
 
             // calculate an initial approximation and swarm
@@ -427,7 +430,8 @@ void MainWindow::optimize()
 
             const auto bestImf = calculateImfFromPairsOfReals(
                         getSamplesFromParams( bestParams, nSamples ) );
-            cu::for_each( begin(f), end(f), bestImf.begin(), bestImf.end(),
+            cu::for_each( begin(residue), end(residue),
+                          begin(bestImf), end(bestImf),
                           []( double & lhs, double rhs ){ lhs -= rhs; } );
         } // while loop
     }; // QU_HANDLE_ALL_EXCEPTIONS_FROM
