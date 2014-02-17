@@ -8,7 +8,6 @@
 #include "cpp_utils/math_constants.h"
 #include "cpp_utils/optimize.h"
 #include "cpp_utils/parallel_executor.h"
-#include "cpp_utils/sqr.h"
 #include "cpp_utils/std_make_unique.h"
 #include "cpp_utils/user_parameter.h"
 

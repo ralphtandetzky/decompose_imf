@@ -193,5 +193,36 @@ std::map<std::string,
                        [&]( double & s ){ s -= average; } );
         return samples;
     };
+    functions["zero_moments"] =
+        []( const std::vector<double> & args, std::vector<double> samples )
+    {
+        if ( args.size() != 1 )
+            CU_THROW( "The 'zero_moments' preprocessing step expects "
+                      "exactly one argument, not " +
+                      std::to_string(args.size()) + "." );
+        const auto n = size_t(args.front());
+        if ( n != args.front() )
+            CU_THROW( "The argument to 'zero_moments' is not a "
+                      "positive integer." );
+        std::vector<std::vector<double>> base;
+        for ( auto i = size_t{0}; i <= n; ++i )
+        {
+            auto last = samples;
+            std::iota( begin(last), end(last), 0 );
+            for ( auto & s : last )
+                s = pow( s, i );
+            base.emplace_back( std::move(last) );
+        }
+        base = cu::gramSchmidtProcess( std::move(base) );
+        for ( const auto & v : base )
+        {
+            const auto prod =
+            cu::innerProduct( begin(samples),end(samples),
+                              begin(v), end(v), 0. );
+            cu::subAssign( begin(samples), end(samples), prod,
+                           begin(v), end(v) );
+        }
+        return samples;
+    };
     return functions;
 }

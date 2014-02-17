@@ -24,7 +24,6 @@ HEADERS  += stdafx.h \
     cpp_utils/parallel_executor.h \
     cpp_utils/scope_guard.h \
     cpp_utils/spin_lock.h \
-    cpp_utils/sqr.h \
     cpp_utils/std_make_unique.h \
     cpp_utils/value_ptr.h \
     cpp_utils/virtual_call.h \

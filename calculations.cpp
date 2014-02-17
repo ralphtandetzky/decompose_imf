@@ -1,6 +1,5 @@
 #include "calculations.h"
 
-#include "cpp_utils/sqr.h"
 #include "cpp_utils/math_constants.h"
 #include "cpp_utils/more_algorithms.h"
 
