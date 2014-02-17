@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <random>
 #include <sstream>
 
 
@@ -129,6 +130,23 @@ std::map<std::string,
                       std::to_string(samples.size()) + "." );
         return std::vector<double>( samples.begin()+first,
                                     samples.begin()+last );
+    };
+    functions["gaussian_noise"] =
+        []( const std::vector<double> & args, std::vector<double> samples )
+    {
+        if ( args.size() != 1 )
+            CU_THROW( "The 'gaussian_noise' preprocessing step expects "
+                      "exactly one argument, not " +
+                      std::to_string(args.size()) + "." );
+        const auto sigma = args.front();
+        if ( sigma <= 0 )
+            CU_THROW( "Invalid argument " + std::to_string(sigma) +
+                      " for 'gaussian_noise'. Argument must be positive." );
+        std::mt19937 rng;
+        auto dist = std::normal_distribution<double>(0, sigma);
+        for ( auto & x : samples )
+            x += dist(rng);
+        return samples;
     };
     functions["high_pass"] =
         []( const std::vector<double> & args, std::vector<double> samples )
