@@ -429,9 +429,8 @@ void MainWindow::optimize()
 
             const auto bestImf = calculateImfFromPairsOfReals(
                         getSamplesFromParams( bestParams, nSamples ) );
-            cu::for_each( begin(residue), end(residue),
-                          begin(bestImf), end(bestImf),
-                          []( double & lhs, double rhs ){ lhs -= rhs; } );
+            cu::subAssign( begin(residue), end(residue), 1.,
+                           begin(bestImf), end(bestImf) );
         } // while loop
     }; // QU_HANDLE_ALL_EXCEPTIONS_FROM
     } ); // task for worker
