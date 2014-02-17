@@ -45,7 +45,8 @@ HEADERS  += stdafx.h \
     cpp_utils/cow_map.h \
     qt_utils/event_filter.h \
     qt_utils/invoke_in_thread.h \
-    cpp_utils/extract_by_line.h
+    cpp_utils/extract_by_line.h \
+    processing.h
 
 SOURCES += main.cpp\
     gui_main_window.cpp \
@@ -57,7 +58,8 @@ SOURCES += main.cpp\
     qt_utils/gui_property_sheet.cpp \
     cpp_utils/formula_parser.cpp \
     qt_utils/exception_handling.cpp \
-    cpp_utils/extract_by_line.cpp
+    cpp_utils/extract_by_line.cpp \
+    processing.cpp
 
 FORMS    += \
     gui_main_window.ui
