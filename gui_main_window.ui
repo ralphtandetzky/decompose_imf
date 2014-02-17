@@ -24,15 +24,18 @@
        <item>
         <widget class="QTabWidget" name="samplesTabWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="fromExpressionTab">
           <attribute name="title">
            <string>From Expression</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3">
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <property name="bottomMargin">
-            <number>3</number>
+            <number>0</number>
            </property>
            <item>
             <widget class="QGroupBox" name="groupBox">
@@ -144,7 +147,7 @@
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
-               <height>5</height>
+               <height>15</height>
               </size>
              </property>
             </spacer>
@@ -156,8 +159,11 @@
            <string>From File</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <property name="bottomMargin">
-            <number>3</number>
+            <number>0</number>
            </property>
            <item>
             <layout class="QGridLayout" name="gridLayout_4">
@@ -204,17 +210,30 @@
             </layout>
            </item>
            <item>
-            <widget class="QLabel" name="label_18">
-             <property name="text">
-              <string>File Info</string>
+            <spacer name="verticalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
              </property>
-             <property name="buddy">
-              <cstring>fileInfoTextBrowser</cstring>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
              </property>
-            </widget>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>6</height>
+              </size>
+             </property>
+            </spacer>
            </item>
            <item>
-            <widget class="QTextBrowser" name="fileInfoTextBrowser"/>
+            <widget class="QLabel" name="fileInfoLabel">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="wordWrap">
+              <bool>false</bool>
+             </property>
+            </widget>
            </item>
            <item>
             <spacer name="verticalSpacer_7">
@@ -224,7 +243,7 @@
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
-               <height>5</height>
+               <height>9</height>
               </size>
              </property>
             </spacer>
@@ -238,7 +257,6 @@
          <property name="title">
           <string>Preprocessing Steps</string>
          </property>
-         <zorder>verticalLayoutWidget</zorder>
         </widget>
        </item>
        <item>

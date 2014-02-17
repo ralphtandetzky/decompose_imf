@@ -644,7 +644,7 @@ void MainWindow::readSamplesFile( const QString & qFileName )
         {
             m->ui.samplesFileLineEdit->setText( qFileName );
             m->samples = std::move(vals);
-            m->ui.fileInfoTextBrowser->setText(
+            m->ui.fileInfoLabel->setText(
                 QString("The number of samples is %1.")
                         .arg( m->samples.size() ));
         } );
