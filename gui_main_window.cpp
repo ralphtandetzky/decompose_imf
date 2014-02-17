@@ -237,14 +237,12 @@ void MainWindow::optimize()
     else
         CU_THROW( "No tab is open for selecting the samples." );
 
-    const auto processingFunctions = createProcessingFunctions();
-    f = processSamples( f, preprocessing, processingFunctions );
-
-    const auto nSamples = f.size();
     m->graphDisplay->show();
 
     // concurrently launch optimization on the worker thread
     m->worker.addTask( [=]() mutable // only f is mutated
+    {
+    QU_HANDLE_ALL_EXCEPTIONS_FROM
     {
         using cu::pi;
         m->shared( []( Impl::SharedData & shared )
@@ -255,8 +253,13 @@ void MainWindow::optimize()
 
         auto done = false;
 
+        const auto processingFunctions = createProcessingFunctions();
+        f = processSamples( f, preprocessing, processingFunctions );
+
         while ( !done )
         {
+            const auto nSamples = f.size();
+
             // calculate an initial approximation and swarm
             const auto initApprox = initializer(f);
 
@@ -427,6 +430,7 @@ void MainWindow::optimize()
             cu::for_each( begin(f), end(f), bestImf.begin(), bestImf.end(),
                           []( double & lhs, double rhs ){ lhs -= rhs; } );
         } // while loop
+    }; // QU_HANDLE_ALL_EXCEPTIONS_FROM
     } ); // task for worker
 }
 
