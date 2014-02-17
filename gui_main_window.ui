@@ -20,7 +20,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1">
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1,1">
        <item>
         <widget class="QTabWidget" name="samplesTabWidget">
          <property name="currentIndex">
@@ -264,6 +264,18 @@
              <bool>true</bool>
             </property>
            </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_5">
+         <property name="title">
+          <string>Interprocessing Steps</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <item>
+           <widget class="QPlainTextEdit" name="interprocessingTextEdit"/>
           </item>
          </layout>
         </widget>
