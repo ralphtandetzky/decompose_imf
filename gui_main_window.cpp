@@ -113,7 +113,7 @@ struct MainWindow::Impl
 
 
 MainWindow::MainWindow(QWidget *parent)
-    : QWidget(parent)
+    : QMainWindow(parent)
     , m( std::make_unique<Impl>() )
 {
     m->ui.setupUi(this);

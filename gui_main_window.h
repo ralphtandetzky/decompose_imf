@@ -1,11 +1,11 @@
 #pragma once
 
-#include <QWidget>
+#include <QMainWindow>
 #include <memory>
 
 namespace gui {
 
-class MainWindow : public QWidget
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
     
