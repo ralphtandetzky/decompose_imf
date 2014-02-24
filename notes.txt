@@ -30,15 +30,29 @@ Ideas for improving the total result
     The idea behind that is very simple: The cosine is an even function.
     Hence pieces with negative phase velocity could be replaced by the
     negative of the original phase plus an integer multiple of $2\pi$.
-	
+
+
+Things already done on the gui
+==============================
+* Let the user choose the noise level to be added to the initial
+    approximation. => This is done by preprocessing steps and
+    interprocessing steps.
+* Let the user choose the parameters of the target function. => The user can
+    enter arbitrary formulas for target functions and hence change parameters.
+
 
 Things to do on the gui
 =======================
-* Let the user choose the noise level to be added to the initial
-    approximation
-* Let the user choose the parameters of the target function
+* Let the user interactively decide which IMF should be fitted next.
+    For example, after fitting the second IMF the user may choose to start
+    fitting a new IMF, or to find a better match for the first IMF based on
+    the current fit of the second IMF.
+* Provide facilities to export the fitted IMFs.
+* Let the user choose what shall be displayed in the graph window.
+* Let the user store and load settings files to and from the file system.
+    Repeatability!
 * Let the user choose whether only the phase shall be fitted or both phase
-    and amplitude shall be fitted
+    and amplitude shall be fitted.
     
 
 Test functions for optimization tests
