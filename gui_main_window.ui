@@ -28,7 +28,7 @@
         <item>
          <widget class="QTabWidget" name="samplesTabWidget">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="fromExpressionTab">
            <attribute name="title">
@@ -197,16 +197,16 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="1" rowspan="2">
+              <item row="1" column="1">
                <widget class="QToolButton" name="toolButton">
                 <property name="icon">
                  <iconset resource="resources.qrc">
-                  <normaloff>:/new/icons/icon_open_file.png</normaloff>:/new/icons/icon_open_file.png</iconset>
+                  <normaloff>:/new/icons/icon_open_file_24x24.png</normaloff>:/new/icons/icon_open_file_24x24.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
-                  <width>48</width>
-                  <height>48</height>
+                  <width>24</width>
+                  <height>24</height>
                  </size>
                 </property>
                </widget>
@@ -690,6 +690,12 @@
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
+   <property name="iconSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -706,11 +712,19 @@
    <addaction name="actionCancel"/>
   </widget>
   <action name="actionQuit">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/icons/icon_quit_app_24x24.png</normaloff>:/new/icons/icon_quit_app_24x24.png</iconset>
+   </property>
    <property name="text">
     <string>Quit</string>
    </property>
   </action>
   <action name="actionSaveInputs">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/icons/icon_save_file_24x24.png</normaloff>:/new/icons/icon_save_file_24x24.png</iconset>
+   </property>
    <property name="text">
     <string>Save Inputs</string>
    </property>
@@ -719,11 +733,19 @@
    </property>
   </action>
   <action name="actionSaveInputsAs">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/icons/icon_save_file_as_24x24.png</normaloff>:/new/icons/icon_save_file_as_24x24.png</iconset>
+   </property>
    <property name="text">
     <string>Save Inputs as...</string>
    </property>
   </action>
   <action name="actionOpenInputFile">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/icons/icon_open_file_24x24.png</normaloff>:/new/icons/icon_open_file_24x24.png</iconset>
+   </property>
    <property name="text">
     <string>Open Input File</string>
    </property>
@@ -732,16 +754,28 @@
    </property>
   </action>
   <action name="actionRun">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/icons/icon_run_24x24.png</normaloff>:/new/icons/icon_run_24x24.png</iconset>
+   </property>
    <property name="text">
     <string>Run</string>
    </property>
   </action>
   <action name="actionNextImf">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/icons/icon_next_imf_24x24.png</normaloff>:/new/icons/icon_next_imf_24x24.png</iconset>
+   </property>
    <property name="text">
     <string>Find Next IMF</string>
    </property>
   </action>
   <action name="actionCancel">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/new/icons/icon_cancel_24x24.png</normaloff>:/new/icons/icon_cancel_24x24.png</iconset>
+   </property>
    <property name="text">
     <string>Cancel</string>
    </property>
@@ -754,7 +788,6 @@
   <tabstop>xmaxSpinBox</tabstop>
   <tabstop>nSamplesSpinBox</tabstop>
   <tabstop>samplesFileLineEdit</tabstop>
-  <tabstop>toolButton</tabstop>
   <tabstop>preprocessingTextEdit</tabstop>
   <tabstop>interprocessingTextEdit</tabstop>
   <tabstop>initApproxMethComboBox</tabstop>
@@ -868,8 +901,8 @@
      <y>577</y>
     </hint>
     <hint type="destinationlabel">
-     <x>490</x>
-     <y>560</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
    </hints>
   </connection>
@@ -884,8 +917,8 @@
      <y>585</y>
     </hint>
     <hint type="destinationlabel">
-     <x>329</x>
-     <y>566</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
    </hints>
   </connection>
@@ -900,8 +933,8 @@
      <y>583</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>564</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
    </hints>
   </connection>
