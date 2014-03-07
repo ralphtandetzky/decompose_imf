@@ -458,7 +458,9 @@ void MainWindow::calculateNextImf()
 void MainWindow::selectSamplesFile()
 try
 {
-    const auto qFileName = QFileDialog::getOpenFileName();
+    const auto qFileName = QFileDialog::getOpenFileName(
+                this, "Select A Samples File",
+                m->ui.samplesFileLineEdit->text() );
     if ( qFileName.isNull() ) // user cancelled?
         return;
     readSamplesFile( qFileName );
