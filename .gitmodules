@@ -1,9 +1,10 @@
 [submodule "cpp_utils"]
 	path = cpp_utils
-	url = git@github.com:ralphtandetzky/cpp_utils.git
+	url = https://github.com/ralphtandetzky/cpp_utils.git
 [submodule "qt_utils"]
 	path = qt_utils
-	url = git@github.com:ralphtandetzky/qt_utils.git
+	url = https://github.com/ralphtandetzky/qt_utils.git
 [submodule "decompose_imf_notes"]
 	path = decompose_imf_notes
-	url = git@github.com:ralphtandetzky/decompose_imf_notes.git
+	url = https://github.com/ralphtandetzky/decompose_imf_notes.git
+
