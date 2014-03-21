@@ -938,11 +938,62 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionSaveInputs</sender>
+   <signal>triggered()</signal>
+   <receiver>gui::MainWindow</receiver>
+   <slot>saveInputs()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>303</x>
+     <y>303</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSaveInputsAs</sender>
+   <signal>triggered()</signal>
+   <receiver>gui::MainWindow</receiver>
+   <slot>saveInputsAs()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>303</x>
+     <y>303</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionOpenInputFile</sender>
+   <signal>triggered()</signal>
+   <receiver>gui::MainWindow</receiver>
+   <slot>openInputFile()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>303</x>
+     <y>303</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>optimize()</slot>
   <slot>cancel()</slot>
   <slot>calculateNextImf()</slot>
   <slot>selectSamplesFile()</slot>
+  <slot>saveInputs()</slot>
+  <slot>saveInputsAs()</slot>
+  <slot>openInputFile()</slot>
  </slots>
 </ui>

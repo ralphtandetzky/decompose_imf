@@ -455,6 +455,21 @@ void MainWindow::calculateNextImf()
 }
 
 
+void MainWindow::openInputFile()
+{
+}
+
+
+void MainWindow::saveInputs()
+{
+}
+
+
+void MainWindow::saveInputsAs()
+{
+}
+
+
 void MainWindow::selectSamplesFile()
 try
 {
