@@ -32,13 +32,16 @@
 #include <opencv/cv.h>
 
 static char const * const InputDataNameFromSettings = "InputData";
+static char const * const InputDataFileNameFromSettings = "InputDataFileName";
+
 
 namespace gui {
 
 struct MainWindow::Impl
 {
-    Impl()
-        : worker{ 1 } // create onle one thread.
+    Impl( MainWindow * parent )
+        : mainWindow(parent)
+        , worker{ 1 } // create only one thread.
     {
     }
 
@@ -63,10 +66,25 @@ struct MainWindow::Impl
                 QString::fromStdString(initializer.first) );
     }
 
+    void readInputData( std::istream & is )
+    {
+        readProperties( is, serializers );
+
+        // open the file in the samples file line edit, if any.
+        samples.clear();
+        const auto samplesFileName = ui.samplesFileLineEdit->text();
+        if ( !samplesFileName.isEmpty() )
+            QU_HANDLE_ALL_EXCEPTIONS_FROM {
+                mainWindow->readSamplesFile( samplesFileName );
+            };
+    }
+
     /////////////////////
     // Gui thread data //
     /////////////////////
 
+    // parent object
+    MainWindow * mainWindow;
     // Contains Qt user interface elements.
     Ui::MainWindow ui;
     // Objects which help to load the values in the gui input widgets
@@ -87,7 +105,6 @@ struct MainWindow::Impl
     // A vector of samples read from a file.
     std::vector<double> samples;
     std::unique_ptr<QLabel> graphDisplay;
-
 
     ///////////////////////////////////////////////
     // Data shared between gui thread and worker //
@@ -116,7 +133,7 @@ struct MainWindow::Impl
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , m( std::make_unique<Impl>() )
+    , m( std::make_unique<Impl>(this) )
 {
     m->ui.setupUi(this);
 
@@ -154,15 +171,8 @@ MainWindow::MainWindow(QWidget *parent)
                 .value( InputDataNameFromSettings )
                 .toString()
                 .toStdString() );
-    readProperties( inputData, m->serializers );
 
-    // open the file in the samples file line edit, if any.
-    const auto samplesFileName = m->ui.samplesFileLineEdit->text();
-    if ( !samplesFileName.isEmpty() )
-        QU_HANDLE_ALL_EXCEPTIONS_FROM {
-            readSamplesFile( samplesFileName );
-        };
-
+    m->readInputData( inputData );
 }
 
 
@@ -468,16 +478,53 @@ void MainWindow::calculateNextImf()
 
 void MainWindow::openInputFile()
 {
+    const auto qFileName = QFileDialog::getOpenFileName(
+                this, "Select An Input Data File",
+                QSettings().value(InputDataFileNameFromSettings).toString() );
+    if ( qFileName.isNull() ) // user cancelled?
+        return;
+    std::ifstream file( qFileName.toStdString() );
+    if ( !file.good() )
+        CU_THROW( "Could not open the selected file." );
+    m->readInputData( file );
+    QSettings().setValue( InputDataFileNameFromSettings, qFileName );
 }
 
 
 void MainWindow::saveInputs()
 {
+    const auto qFileName =
+            QSettings()
+            .value(InputDataFileNameFromSettings)
+            .toString();
+    if (qFileName.isNull() || qFileName.isEmpty() )
+    {
+        saveInputsAs();
+        return;
+    }
+    std::ofstream file( qFileName.toStdString() );
+    if ( !file.good() )
+    {
+        saveInputsAs();
+        return;
+    }
+    writeProperties( file, m->serializers );
 }
 
 
 void MainWindow::saveInputsAs()
 {
+    const auto qFileName = QFileDialog::getSaveFileName(
+                this, "Save Input Data File",
+                QSettings().value(InputDataFileNameFromSettings).toString() );
+    if ( qFileName.isNull() ) // user cancelled?
+        return;
+    const auto fileName = qFileName.toStdString();
+    std::ofstream file( fileName );
+    if ( !file.good() )
+        CU_THROW( "Failed to open the file '" + fileName + "'." );
+    writeProperties( file, m->serializers );
+    QSettings().setValue( InputDataFileNameFromSettings, qFileName );
 }
 
 
