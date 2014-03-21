@@ -31,6 +31,8 @@
 
 #include <opencv/cv.h>
 
+static char const * const InputDataNameFromSettings = "InputData";
+
 namespace gui {
 
 struct MainWindow::Impl
@@ -147,8 +149,12 @@ MainWindow::MainWindow(QWidget *parent)
                                    std::back_inserter( m->serializers ) );
 
     // load serialized input widget entries from a settings file.
-    std::ifstream file( "settings.txt" );
-    readProperties( file, m->serializers );
+    std::stringstream inputData(
+                QSettings()
+                .value( InputDataNameFromSettings )
+                .toString()
+                .toStdString() );
+    readProperties( inputData, m->serializers );
 
     // open the file in the samples file line edit, if any.
     const auto samplesFileName = m->ui.samplesFileLineEdit->text();
@@ -162,12 +168,17 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    // stop any running optimization thread
-    cancel();
+    QU_HANDLE_ALL_EXCEPTIONS_FROM
+    {
+        // stop any running optimization thread
+        cancel();
 
-    // store current values from gui input widget entries.
-    std::ofstream file( "settings.txt" );
-    writeProperties( file, m->serializers );
+        // store current values from gui input widget entries.
+        std::ostringstream ss;
+        writeProperties( ss, m->serializers );
+        QSettings().setValue( InputDataNameFromSettings,
+                              QString::fromStdString(ss.str()) );
+    };
 }
 
 
