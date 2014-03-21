@@ -6,4 +6,4 @@
 	url = git@github.com:ralphtandetzky/qt_utils.git
 [submodule "decompose_imf_notes"]
 	path = decompose_imf_notes
-	url = git@github.com:ralphtandetzky/decompose_imf.git
+	url = git@github.com:ralphtandetzky/decompose_imf_notes.git
