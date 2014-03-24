@@ -45,7 +45,8 @@ HEADERS  += stdafx.h \
 	qt_utils/gui_property_sheet.h \
 	qt_utils/gui_user_parameter.h \
 	qt_utils/invoke_in_thread.h \
-	qt_utils/serialize_props.h
+	qt_utils/serialize_props.h \
+    optimization_task.h
 
 SOURCES += main.cpp\
 	calculations.cpp \
