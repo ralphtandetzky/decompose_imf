@@ -14,7 +14,6 @@ TEMPLATE = app
 
 PRECOMPILED_HEADER = stdafx.h
 HEADERS  += stdafx.h \
-    calculations.h \
     gui_main_window.h \
     processing.h \
     cpp_utils/bwt.h \
@@ -49,7 +48,6 @@ HEADERS  += stdafx.h \
     decompose_imf_lib/optimization_task.h
 
 SOURCES += main.cpp \
-    calculations.cpp \
     gui_main_window.cpp \
     processing.cpp \
     cpp_utils/extract_by_line.cpp \
