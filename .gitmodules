@@ -7,3 +7,6 @@
 [submodule "decompose_imf_notes"]
 	path = decompose_imf_notes
 	url = git@github.com:ralphtandetzky/decompose_imf_notes.git
+[submodule "decompose_imf_lib"]
+	path = decompose_imf_lib
+	url = git@github.com:ralphtandetzky/decompose_imf_lib.git
