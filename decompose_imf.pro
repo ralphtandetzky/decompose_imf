@@ -45,7 +45,8 @@ HEADERS  += stdafx.h \
     qt_utils/gui_user_parameter.h \
     qt_utils/invoke_in_thread.h \
     qt_utils/serialize_props.h \
-    decompose_imf_lib/optimization_task.h
+    decompose_imf_lib/optimization_task.h \
+    decompose_imf_lib/calculations.h
 
 SOURCES += main.cpp \
     gui_main_window.cpp \
@@ -57,7 +58,8 @@ SOURCES += main.cpp \
     qt_utils/exception_handling.cpp \
     qt_utils/gui_property_sheet.cpp \
     qt_utils/gui_user_parameter.cpp \
-    qt_utils/serialize_props.cpp
+    qt_utils/serialize_props.cpp \
+    decompose_imf_lib/calculations.cpp
 
 FORMS    += \
     gui_main_window.ui
