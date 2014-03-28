@@ -13,6 +13,7 @@
 #include "qt_utils/event_filter.h"
 #include "qt_utils/exception_handling.h"
 #include "qt_utils/invoke_in_thread.h"
+#include "qt_utils/loop_thread.h"
 #include "qt_utils/serialize_props.h"
 
 #include <array>
@@ -38,7 +39,6 @@ struct MainWindow::Impl
 {
     Impl( MainWindow * parent )
         : mainWindow(parent)
-        , worker( new QThread( mainWindow ) )
     {
     }
 
@@ -104,7 +104,7 @@ struct MainWindow::Impl
     std::unique_ptr<QLabel> graphDisplay;
 
     dimf::OptimizationTask optimizationTask;
-    QThread * worker;
+    qu::LoopThread worker;
 };
 
 
@@ -385,7 +385,7 @@ catch (...)
 void MainWindow::readSamplesFile( const QString & qFileName )
 {
     cancel();
-    qu::invokeInThreadAsync( m->worker, [=]()
+    qu::invokeInThreadAsync( &m->worker, [=]()
     {
     QU_HANDLE_ALL_EXCEPTIONS_FROM
     {

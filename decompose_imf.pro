@@ -46,7 +46,8 @@ HEADERS  += stdafx.h \
     qt_utils/serialize_props.h \
     decompose_imf_lib/calculations.h \
     decompose_imf_lib/optimization_task.h \
-    decompose_imf_lib/processing.h
+    decompose_imf_lib/processing.h \
+    qt_utils/loop_thread.h
 
 SOURCES += main.cpp \
     gui_main_window.cpp \
