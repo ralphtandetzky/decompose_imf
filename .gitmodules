@@ -10,3 +10,6 @@
 [submodule "decompose_imf_lib"]
 	path = decompose_imf_lib
 	url = git@github.com:ralphtandetzky/decompose_imf_lib.git
+[submodule "decompose_imf_gui"]
+	path = decompose_imf_gui
+	url = git@github.com:ralphtandetzky/decompose_imf_gui.git
