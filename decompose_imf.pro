@@ -15,7 +15,6 @@ TEMPLATE = app
 PRECOMPILED_HEADER = stdafx.h
 HEADERS  += stdafx.h \
     gui_main_window.h \
-    processing.h \
     cpp_utils/bwt.h \
     cpp_utils/cloning.h \
     cpp_utils/concurrent_queue.h \
@@ -45,12 +44,12 @@ HEADERS  += stdafx.h \
     qt_utils/gui_user_parameter.h \
     qt_utils/invoke_in_thread.h \
     qt_utils/serialize_props.h \
+    decompose_imf_lib/calculations.h \
     decompose_imf_lib/optimization_task.h \
-    decompose_imf_lib/calculations.h
+    decompose_imf_lib/processing.h
 
 SOURCES += main.cpp \
     gui_main_window.cpp \
-    processing.cpp \
     cpp_utils/extract_by_line.cpp \
     cpp_utils/formula_parser.cpp \
     cpp_utils/user_parameter.cpp \
@@ -59,7 +58,9 @@ SOURCES += main.cpp \
     qt_utils/gui_property_sheet.cpp \
     qt_utils/gui_user_parameter.cpp \
     qt_utils/serialize_props.cpp \
-    decompose_imf_lib/calculations.cpp
+    decompose_imf_lib/optimization_task.cpp \
+    decompose_imf_lib/calculations.cpp \
+    decompose_imf_lib/processing.cpp
 
 FORMS    += \
     gui_main_window.ui
