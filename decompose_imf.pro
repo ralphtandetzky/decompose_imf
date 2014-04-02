@@ -5,4 +5,5 @@ SUBDIRS = \
 	qt_utils \
 	decompose_imf_lib \
 	decompose_imf_gui \
+	convert_matrix \
 

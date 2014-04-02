@@ -13,3 +13,6 @@
 [submodule "decompose_imf_gui"]
 	path = decompose_imf_gui
 	url = git@github.com:ralphtandetzky/decompose_imf_gui.git
+[submodule "convert_matrix"]
+	path = convert_matrix
+	url = git@github.com:ralphtandetzky/convert_matrix.git
