@@ -1,24 +1,25 @@
-[submodule "cpp_utils"]
-	path = cpp_utils
-	url = git@github.com:ralphtandetzky/cpp_utils.git
-[submodule "qt_utils"]
-	path = qt_utils
-	url = git@github.com:ralphtandetzky/qt_utils.git
-[submodule "decompose_imf_notes"]
-	path = decompose_imf_notes
-	url = git@github.com:ralphtandetzky/decompose_imf_notes.git
-[submodule "decompose_imf_lib"]
-	path = decompose_imf_lib
-	url = git@github.com:ralphtandetzky/decompose_imf_lib.git
-[submodule "decompose_imf_gui"]
-	path = decompose_imf_gui
-	url = git@github.com:ralphtandetzky/decompose_imf_gui.git
 [submodule "convert_matrix"]
 	path = convert_matrix
 	url = git@github.com:ralphtandetzky/convert_matrix.git
+[submodule "cpp_utils"]
+	path = cpp_utils
+	url = git@github.com:ralphtandetzky/cpp_utils.git
 [submodule "decompose_imf_batch"]
 	path = decompose_imf_batch
 	url = git@github.com:ralphtandetzky/decompose_imf_batch.git
+[submodule "decompose_imf_gui"]
+	path = decompose_imf_gui
+	url = git@github.com:ralphtandetzky/decompose_imf_gui.git
+[submodule "decompose_imf_lib"]
+	path = decompose_imf_lib
+	url = git@github.com:ralphtandetzky/decompose_imf_lib.git
 [submodule "decompose_imf_matlab"]
 	path = decompose_imf_matlab
-	url = ../decompose_imf_matlab/
+	url = git@github.com:ralphtandetzky/decompose_imf_matlab.git
+[submodule "decompose_imf_notes"]
+	path = decompose_imf_notes
+	url = git@github.com:ralphtandetzky/decompose_imf_notes.git
+[submodule "qt_utils"]
+	path = qt_utils
+	url = git@github.com:ralphtandetzky/qt_utils.git
+
