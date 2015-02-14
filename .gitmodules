@@ -19,3 +19,6 @@
 [submodule "decompose_imf_batch"]
 	path = decompose_imf_batch
 	url = git@github.com:ralphtandetzky/decompose_imf_batch.git
+[submodule "decompose_imf_matlab"]
+	path = decompose_imf_matlab
+	url = ../decompose_imf_matlab/
